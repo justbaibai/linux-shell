@@ -16,6 +16,7 @@ if [ $? -eq 0 ];then
 	echo "installed yum openvpn is ok"
 else
 	echo "installed is not ok"
+fi
 
 yum install -y unzip >/dev/null 2>&1
 wget https://github.com/OpenVPN/easy-rsa/archive/master.zip >/dev/null 2>&1
