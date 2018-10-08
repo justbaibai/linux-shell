@@ -4,4 +4,5 @@
  </p>
 
 ![](https://img.shields.io/badge/linux-%E5%B8%B8%E8%A7%84%E4%B8%80%E9%94%AE%E8%84%9A%E6%9C%AC-green.svg)
+![](https://img.shields.io/badge/baibai-love%20linux%20and%20sec-blue.svg)
 关于运维的东西  
