@@ -367,3 +367,8 @@ client_header_buffer_size 1k;
 large_client_header_buffers 4 8k;
 最大缓存个数和每个缓存的大小，用来读取超大客户端请求头。一个请求行大小不能超过1个缓存的大小，否则将返回414给客户端。一个请求头的大小同样不能大于1个缓存的大小，否则将返回400错误给客户端。缓存是按需分配的。默认1个缓存大小为8k。在请求连接过度到keep-alive状态后，缓存将被释放。large_client_header_buffers 4 8k;
 
+
+if ( $http_user_agent ~* "(Android|iPhone|Windows Phone|UC|Kindle)" ){ // 跳转判断
+        rewrite  ^/(.*)$  https://m.7d.com$uri redirect; // redirect表示302跳转（暂时性转移）　
+     }     
+  
