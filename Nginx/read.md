@@ -371,4 +371,13 @@ large_client_header_buffers 4 8k;
 if ( $http_user_agent ~* "(Android|iPhone|Windows Phone|UC|Kindle)" ){ // 跳转判断
         rewrite  ^/(.*)$  https://m.7d.com$uri redirect; // redirect表示302跳转（暂时性转移）　
      }     
+     
+location ~* \.(gif|jpg|png|jpeg)$ {
+    expires     30d;
+    valid_referers *.hugao8.com www.hugao8.com m.hugao8.com *.baidu.com *.google.com;
+    if ($invalid_referer) {
+    rewrite ^/ http://ww4.sinaimg.cn/bmiddle/051bbed1gw1egjc4xl7srj20cm08aaa6.jpg;
+    #return 404;
+    }
+    }
   
