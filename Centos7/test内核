@@ -1,0 +1,38 @@
+整参数和不调整差别非常大，默认参数都设置比较小，在大并发，高负载时基本不能满足。调整之后，问题基本解决。
+vi /etc/sysctl.conf 编辑sysctl.conf
+net.ipv4.ip_local_port_range = 1024  65000
+net.ipv4.tcp_timestamps=1
+kernel.core_uses_pid = 1
+net.ipv4.tcp_syncookies=1
+net.ipv4.tcp_syn_retries=1
+net.ipv4.tcp_synack_retries=1
+net.ipv4.tcp_tw_recycle=1
+net.ipv4.tcp_tw_reuse=1
+net.ipv4.tcp_fin_timeout=5
+net.ipv4.route.gc_timeout=20
+net.ipv4.tcp_keepalive_time=20
+net.ipv4.tcp_max_syn_backlog= 655360
+net.ipv4.ip_conntrack_max = 655360
+先简单介绍下 背景吧
+通 过webbench压nginx+memcache时，被压的服务器nginx，memcache的cpu使用非常低，而且服务器负载也很小，但是 webbench的结果却不乐观，失败非常多，通过分析，压力根本没到nginx和memcache，可能在服务器级就挡住了压力，并且发现/var /log/message里面有关于ip_conntrack_max(一个连接hash表)满了的报错，然后顺藤摸瓜，通过查看linux的man tcp 手册，一个参数一个参数的研究，终于总结了上面的一些配置，解决了问题。
+
+现象：/var/log/message里面有关于ip_conntrack_max 如ip_conntrack: table full, dropping packet.
+解决方法：
+观察链接跟踪表是(/proc/net/ip_conntrack)
+IP_conntrack 表示连接跟踪数据库(conntrack database)，代表NAT机器跟踪连接的数目，连接跟踪表能容纳多少记录是被一个变量控制的，他可由内核中的ip- sysctl函数配置。每一个跟踪连接表会占用350字节的内核存储空间，时间一长就会把默认的空间填满，那么默认空间时多少？我以redhat为例在内 存为64MB的机器上时4096,内存为128MB是 8192,内存为256MB是16376，那末就能在/proc/sys/net/ipv4/ip_conntrack_max里查看、配置。
+针对于我们的业务模式，比较重要的是
+net.ipv4.ip_local_port_range = 1024 65000 表示用于向外连接的端口范围。缺省情况下很小：32768到61000，改为1024到65000。
+net.ipv4.tcp_tw_reuse = 1 表示开启重用。允许将TIME-WAIT sockets重新用于新的TCP连接，默认为0，表示关闭；
+net.ipv4.tcp_tw_recycle = 1 表示开启TCP连接中TIME-WAIT sockets的快速回收，默认为0，表示关闭。
+net.ipv4.ip_conntrack_max = 655360
+net.ipv4.netfilter.ip_conntrack_tcp_timeout_established = 21600
+这个值是控制 红色数字 这个时间的，其他相关参数都在/proc/sys/net/ipv4/netfilter目录下
+ cat /proc/net/ip_conntrack
+udp      17 21 src=192.168.0.18 dst=211.147.6.3 sport=24889 dport=53 packets=1 bytes=71 src=211.147.6.3 dst=192.168.0.18 sport=53 dport=24889 packets=1 bytes=152 use=1
+tcp      6 52 ESTABLISHED src=192.168.0.18 dst=192.168.0.17 sport=52318 dport=3306 packets=44 bytes=2474 src=192.168.0.17 dst=192.168.0.18 sport=3306 dport=52318 packets=43 bytes=2716 [ASSURED] use=1
+ 
+ 
+vi /etc/modprobe.conf 
+options ip_conntrack hashsize=855360  更改  conntrack_buckets
+===========================================================
+===========================================================
