@@ -100,7 +100,9 @@ net.ipv4.tcp_max_tw_buckets = 6000-36000
 表示系统同时保持TIME_WAIT的最大数量，如果超过这个数字，TIME_WAIT将立刻被清除并打印警告信息。默 认为180000，改为6000。
 timewait的数量，默认是180000。超过这个数字立刻被清除并打印警告信息，避免被大量套接字拖死
 
-
+看看是不是你改的   sysctl -p 让他生效  
+ cat  /proc/sys/net/ipv4/tcp_max_tw_buckets
+9000
 
 
 
