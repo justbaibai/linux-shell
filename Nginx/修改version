@@ -1,0 +1,4 @@
+vim  nginx-1.14.0/src/core/nginx.h
+
+#define NGINX_VERSION      "8.8"
+#define NGINX_VER          "xiaobai/" NGINX_VERSION
