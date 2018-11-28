@@ -1,0 +1,216 @@
+#源码编译 yum安装 一般都是都是编译，因为要打开一些参数，做到定制化，还有的有实力的做二次开发。
+
+先写着 有点乱 一会再整理 不着急
+
+./configure --prefix=${nginx_install_dir} --user=${run_user} --group=${run_user} --with-http_stub_status_module --with-http_v2_module --with-http_ssl_module --with-http_gzip_static_module --with-http_realip_module --with-http_flv_module --with-http_mp4_module --with-openssl=../openssl-${openssl_ver} --with-pcre=../pcre-${pcre_ver} --with-pcre-jit --with-ld-opt='-ljemalloc' ${nginx_modules_options}
+
+进程切换 cpu
+绑定cpu 好处 缓存不会失效 cpu的上的缓存 还有效 提升缓存命中率
+
+worker_processes auto; worker_cpu_affinity auto;
+
+configure决定系统的特性，以及nginx可以用来处理连接的某些特性和方法，最后它将创建Makefile。
+
+configure支持以下选项：
+
+–prefix= – 安装路径，如果没有指定，默认为/usr/local/nginx。
+
+–sbin-path= – nginx可执行命令的文件，如果没有指定，默认为/sbin/nginx。
+
+–conf-path= – 在没有使用-c参数指定的情况下nginx.conf的默认位置，如果没有指定，默认为/conf/nginx.conf。
+
+–pid-path= – nginx.pid的路径，如果没有在nginx.conf中通过“pid”指令指定，默认为/logs/nginx.pid。
+
+–lock-path= – nginx.lock文件路径，如果没有指定，默认为/logs/nginx.lock。
+
+–error-log-path= – 当没有在nginx.conf中使用“error_log”指令指定时的错误日志位置，如果没有指定，默认为/logs/error.log。
+
+–http-log-path= – 当没有在nginx.conf中使用“access_log”指令指定时的访问日志位置，如果没有指定，默认为/logs/access.log。
+
+–user= – 当没有在nginx.conf中使用“user”指令指定时nginx运行的用户，如果没有指定，默认为“nobody”。
+
+–group= – 当没有在nginx.conf中使用“user”指令指定时nginx运行的组，如果没有指定，默认为“nobody”。
+
+–builddir=DIR – 设置构建目录。
+
+–with-rtsig_module – 启用rtsig模块。
+
+–with-select_module –without-select_module – 如果在configure的时候没有发现kqueue, epoll, rtsig或/dev/poll其中之一，select模块始终为启用状态。
+
+–with-poll_module –without-poll_module – 如果在configure的时候没有发现kqueue, epoll, rtsig或/dev/poll其中之一，poll模块始终为启用状态。
+
+–with-http_ssl_module – 启用ngx_http_ssl_module，启用SSL支持并且能够处理HTTPS请求。需要OpenSSL，在Debian系统中，对应的包为libssl-dev。
+
+–with-http_realip_module – 启用ngx_http_realip_module
+
+–with-http_addition_module – 启用ngx_http_addition_module
+
+–with-http_sub_module – 启用ngx_http_sub_module
+
+–with-http_dav_module – 启用ngx_http_dav_module
+
+–with-http_flv_module – 启用ngx_http_flv_module
+
+–with-http_stub_status_module – 启用”server status”（服务状态）页
+
+–without-http_charset_module – 禁用ngx_http_charset_module
+
+–without-http_gzip_module – 禁用ngx_http_gzip_module，如果启用，需要zlib包。
+
+–without-http_ssi_module – 禁用ngx_http_ssi_module
+
+–without-http_userid_module – 禁用ngx_http_userid_module
+
+–without-http_access_module – 禁用ngx_http_access_module
+
+–without-http_auth_basic_module – 禁用ngx_http_auth_basic_module
+
+–without-http_autoindex_module – 禁用ngx_http_autoindex_module
+
+–without-http_geo_module – 禁用ngx_http_geo_module
+
+–without-http_map_module – 禁用ngx_http_map_module
+
+–without-http_referer_module – 禁用ngx_http_referer_module
+
+–without-http_rewrite_module – 禁用ngx_http_rewrite_module。如果启用，需要PCRE包。
+
+–without-http_proxy_module – 禁用ngx_http_proxy_module
+
+–without-http_fastcgi_module – 禁用ngx_http_fastcgi_module
+
+–without-http_memcached_module – 禁用ngx_http_memcached_module
+
+–without-http_limit_zone_module – 禁用ngx_http_limit_zone_module
+
+–without-http_empty_gif_module – 禁用ngx_http_empty_gif_module
+
+–without-http_browser_module – 禁用ngx_http_browser_module
+
+–without-http_upstream_ip_hash_module – 禁用ngx_http_upstream_ip_hash_module
+
+–with-http_perl_module – 启用ngx_http_perl_module
+
+–with-perl_modules_path=PATH – 为perl模块设置路径
+
+–with-perl=PATH – 为perl库设置路径
+
+–http-client-body-temp-path=PATH – 为http连接的请求实体临时文件设置路径，如果没有指定，默认为/client_body_temp
+
+–http-proxy-temp-path=PATH – 为http代理临时文件设置路径，如果没有指定，默认为/proxy_temp
+
+–http-fastcgi-temp-path=PATH - 为http fastcgi临时文件设置路径，如果没有指定，默认为/fastcgi_temp
+
+–without-http – 禁用HTTP服务
+
+–with-mail – 启用IMAP4/POP3/SMTP代理模块
+
+–with-mail_ssl_module – 启用ngx_mail_ssl_module
+
+–with-cc=PATH – 设置C编译器路径
+
+–with-cpp=PATH – 设置C预处理器路径
+
+–with-cc-opt=OPTIONS – 变量CFLAGS中附加的参数，用于FreeBSD中的PCRE库，同样需要指定–with-cc-opt=”-I /usr/local/include”，如果我们使用select()函数则需要同时增加文件描述符数量，可以通过–with-cc-opt=”-D FD_SETSIZE=2048”指定。
+
+–with-ld-opt=OPTIONS – 通过连接器的附加参数，用于FreeBSD中的PCRE库，同样需要指定–with-ld-opt=”-L /usr/local/lib”。
+
+–with-cpu-opt=CPU – 指定编译的CPU，可用的值为: pentium, pentiumpro, pentium3, pentium4, athlon, opteron, amd64, sparc32, sparc64, ppc64
+
+–without-pcre – 禁用PCRE库文件，同时将禁用HTTP rewrite 模块，如果要在”location”指令中使用正则表达式，同样需要PCRE库。
+
+–with-pcre=DIR – 设置PCRE库源文件路径。
+
+–with-pcre-opt=OPTIONS – 在编译时为PCRE设置附加参数。
+
+–with-md5=DIR – 设置md5库源文件路径。
+
+–with-md5-opt=OPTIONS – 在编译时为md5设置附加参数。
+
+–with-md5-asm – 使用md5汇编源。
+
+–with-sha1=DIR – 设置sha1库源文件路径。
+
+–with-sha1-opt=OPTIONS – 在编译时为sha1设置附加参数。
+
+–with-sha1-asm – 使用sha1汇编源。
+
+–with-zlib=DIR – 设置zlib库源文件路径。
+
+–with-zlib-opt=OPTIONS – 在编译时为zlib设置附加参数。
+
+–with-zlib-asm=CPU – 为指定的CPU使用zlib汇编源进行优化，可用值为: pentium, pentiumpro。
+
+–with-openssl=DIR – 设置openssl库源文件路径。
+
+–with-openssl-opt=OPTIONS – 在编译时为openssl设置附加参数。
+
+–with-debug – 启用debug记录。
+
+–add-module=PATH – 增加一个在PATH中的第三方模块。
+
+编译参数可能会根据版本的不同进行变化，可以使用./configure –help查看编译参数列表。
+
+由于公司网站需要放置视频，但是默认的服务器环境是没有编译这个支持的模块，视频文件只能缓冲完了在播放，非常麻烦。 --with-http_flv_module --with-http_mp4_module
+
+--with-pcre=path 设置PCRE库的源代码路径，下载PCRE源码后解压缩到指定的path即可，剩下的交给nginx的./configure和make命令完成 --with-pcre-jit 编译PCRE库支持及时编译
+
+支持http_v2协议
+
+--with-http_v2_module 支持SSL加密
+
+1 --with-http_ssl_module 获取客户端真实IP 　
+
+1 --with-http_realip_module 查看Nginx服务器工作状态 　
+
+1 --with-http_stub_status_module 支持Rewrite重写规则
+
+1 --with-pcre=/usr/local/nginx/module/pcre-8.39 实现基于cookie的负载均衡
+
+1 --add-module=/usr/local/nginx/module/nginx-sticky-module-1.2.5 用于从FastCGI、proxy、SCGI 和uWSGI缓存中增加内容清除功能
+
+1 --add-module=/root/ngx_cache_purge-2.1 在Nginx配置中调用lua语言脚本
+
+1 --add-module=/usr/local/nginx/module/lua-nginx-module-0.10.6 提供直接在 Nginx 配置使用包括 "echo", "sleep", "time" 等指令
+
+1 --add-module=/usr/local/nginx/module/echo-nginx-module-0.60 实现大小写字母转换
+
+1 --add-module=/usr/local/nginx/module/ngx_http_lower_upper_case
+
+#定义Nginx运行的用户和用户组 user www www;
+
+#nginx进程数，建议设置为等于CPU总核心数。 worker_processes 8;
+
+#全局错误日志定义类型，[ debug | info | notice | warn | error | crit ] error_log /var/log/nginx/error.log info;
+
+#进程文件 pid /var/run/nginx.pid;
+
+#一个nginx进程打开的最多文件描述符数目，理论值应该是最多打开文件数（系统的值ulimit -n）与nginx进程数相除，但是nginx分配请求并不均匀，所以建议与ulimit -n的值保持一致。 worker_rlimit_nofile 65535;
+
+#工作模式与连接数上限 events { #参考事件模型，use [ kqueue | rtsig | epoll | /dev/poll | select | poll ]; epoll模型是Linux 2.6以上版本内核中的高性能网络I/O模型，如果跑在FreeBSD上面，就用kqueue模型。 use epoll; #单个进程最大连接数（最大连接数=连接数*进程数） worker_connections 65535; }
+
+#设定http服务器 http { include mime.types; #文件扩展名与文件类型映射表 default_type application/octet-stream; #默认文件类型 #charset utf-8; #默认编码 server_names_hash_bucket_size 128; #服务器名字的hash表大小 client_header_buffer_size 32k; #上传文件大小限制 large_client_header_buffers 4 64k; #设定请求缓 client_max_body_size 8m; #设定请求缓 sendfile on; #开启高效文件传输模式，sendfile指令指定nginx是否调用sendfile函数来输出文件，对于普通应用设为 on，如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络I/O处理速度，降低系统的负载。注意：如果图片显示不正常把这个改成off。 autoindex on; #开启目录列表访问，合适下载服务器，默认关闭。 tcp_nopush on; #防止网络阻塞 tcp_nodelay on; #防止网络阻塞 keepalive_timeout 120; #长连接超时时间，单位是秒
+
+#FastCGI相关参数是为了改善网站的性能：减少资源占用，提高访问速度。下面参数看字面意思都能理解。 fastcgi_connect_timeout 300; fastcgi_send_timeout 300; fastcgi_read_timeout 300; fastcgi_buffer_size 64k; fastcgi_buffers 4 64k; fastcgi_busy_buffers_size 128k; fastcgi_temp_file_write_size 128k;
+
+#gzip模块设置 gzip on; #开启gzip压缩输出 gzip_min_length 1k; #最小压缩文件大小 gzip_buffers 4 16k; #压缩缓冲区 gzip_http_version 1.0; #压缩版本（默认1.1，前端如果是squid2.5请使用1.0） gzip_comp_level 2; #压缩等级 gzip_types text/plain application/x-javascript text/css application/xml; #压缩类型，默认就已经包含text/html，所以下面就不用再写了，写上去也不会有问题，但是会有一个warn。 gzip_vary on; #limit_zone crawler $binary_remote_addr 10m; #开启限制IP连接数的时候需要使用
+
+upstream blog.ha97.com { #upstream的负载均衡，weight是权重，可以根据机器配置定义权重。weigth参数表示权值，权值越高被分配到的几率越大。 server 192.168.80.121:80 weight=3; server 192.168.80.122:80 weight=2; server 192.168.80.123:80 weight=3; }
+
+#虚拟主机的配置 server { #监听端口 listen 80; #域名可以有多个，用空格隔开 server_name www.ha97.com ha97.com; index index.html index.htm index.php; root /data/www/ha97; location ~ ..(php|php5)?$ { fastcgi_pass 127.0.0.1:9000; fastcgi_index index.php; include fastcgi.conf; } #图片缓存时间设置 location ~ ..(gif|jpg|jpeg|png|bmp|swf)$ { expires 10d; } #JS和CSS缓存时间设置 location ~ .*.(js|css)?$ { expires 1h; } #日志格式设定 log_format access '$remote_addr - $remote_user [$time_local] "$request" ' '$status $body_bytes_sent "$http_referer" ' '"$http_user_agent" $http_x_forwarded_for'; #定义本虚拟主机的访问日志 access_log /var/log/nginx/ha97access.log access;
+
+#对 "/" 启用反向代理 location / { proxy_pass http://127.0.0.1:88; proxy_redirect off; proxy_set_header X-Real-IP $remote_addr; #后端的Web服务器可以通过X-Forwarded-For获取用户真实IP proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; #以下是一些反向代理的配置，可选。 proxy_set_header Host $host; client_max_body_size 10m; #允许客户端请求的最大单文件字节数 client_body_buffer_size 128k; #缓冲区代理缓冲用户端请求的最大字节数， proxy_connect_timeout 90; #nginx跟后端服务器连接超时时间(代理连接超时) proxy_send_timeout 90; #后端服务器数据回传时间(代理发送超时) proxy_read_timeout 90; #连接成功后，后端服务器响应时间(代理接收超时) proxy_buffer_size 4k; #设置代理服务器（nginx）保存用户头信息的缓冲区大小 proxy_buffers 4 32k; #proxy_buffers缓冲区，网页平均在32k以下的设置 proxy_busy_buffers_size 64k; #高负荷下缓冲大小（proxy_buffers*2） proxy_temp_file_write_size 64k; #设定缓存文件夹大小，大于这个值，将从upstream服务器传 }
+
+#设定查看Nginx状态的地址 location /NginxStatus { stub_status on; access_log on; auth_basic "NginxStatus"; auth_basic_user_file conf/htpasswd; #htpasswd文件的内容可以用apache提供的htpasswd工具来产生。 }
+
+#本地动静分离反向代理配置 #所有jsp的页面均交由tomcat或resin处理 location ~ .(jsp|jspx|do)?$ { proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_pass http://127.0.0.1:8080; } #所有静态文件由nginx直接读取不经过tomcat或resin location ~ ..(htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid|doc|ppt|pdf|xls|mp3|wma)$ { expires 15d; } location ~ ..(js|css)?$ { expires 1h; } } }
+
+设置读取客户端请求头的缓存大小。大多数请求使用默认1kb已经足够了。然而，如果一个请求包含超长cookie，或者来自于wap客户端，那么1k缓存大小可能就不适用了。如果请求行或者请求头大小超过缓存大小，则使用large_client_header_buffers 设置的缓存来接收请求。
+
+client_header_buffer_size 1k;
+
+large_client_header_buffers 4 8k; 最大缓存个数和每个缓存的大小，用来读取超大客户端请求头。一个请求行大小不能超过1个缓存的大小，否则将返回414给客户端。一个请求头的大小同样不能大于1个缓存的大小，否则将返回400错误给客户端。缓存是按需分配的。默认1个缓存大小为8k。在请求连接过度到keep-alive状态后，缓存将被释放。large_client_header_buffers 4 8k;
+
+if ( $http_user_agent ~* "(Android|iPhone|Windows Phone|UC|Kindle)" ){ // 跳转判断 rewrite ^/(.*)$ https://m.7d.com$uri redirect; // redirect表示302跳转（暂时性转移）　 }
+
+location ~* .(gif|jpg|png|jpeg)$ { expires 30d; valid_referers *.hugao8.com www.hugao8.com m.hugao8.com *.baidu.com *.google.com; if ($invalid_referer) { rewrite ^/ http://ww4.sinaimg.cn/bmiddle/051bbed1gw1egjc4xl7srj20cm08aaa6.jpg; #return 404; } }
