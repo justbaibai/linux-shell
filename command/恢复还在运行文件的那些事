@@ -16,6 +16,16 @@ in:imjour   560  575    root    4w      REG                8,3    291881    8615
 rs:main     560  576    root    4w      REG                8,3    291881    8615196 /var/log/messages (deleted)
 [root@localhost log]# cat /proc/560/fd/4 >/var/log/messages
 [root@localhost log]# diff  一下  没问题
-
 cp -a  不行
+
+
+我见过最多的还是他两
+嘻嘻  还是看一下   
+-rw-------. 1 root root   4042 Dec 14 13:11 secure
+-rw-rw-r--. 1 root utmp   6144 Dec 14 13:11 wtmp
+文件在不在吧  
+应给给 > 清空了    嘻嘻
+这就是 大文件rm 还占空间  
+rm 一下删 不了那么多  就  for 一下   
+
 
