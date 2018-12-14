@@ -1,0 +1,26 @@
+
+
+当服务器被一个sb或一群sb入侵者或者自动sb程序入侵了的时  你会发现各种资源100%  或带宽满了  估计就是采矿或者发送垃圾邮件，发 DoS 攻击。
+你会发现服务器奇慢无比 
+
+
+w
+whois
+先干掉哪个sb
+netstate  -uplnt 有没有外没不认识的ip
+
+last
+/var/log/wtmp
+
+/var/log/secure
+没有才叫恐怖那 嘻嘻  lsof  恢复回来   希望他不是被清空
+
+history看看  wget 或 curl 命令来下载那些sb的程序了。
+ ~/.bash_history
+ 
+ top 一下看看  那些用资源用的比较多  用losf 和 strace -p  pid
+ 
+ ps aux  或  ef 
+ 
+ 简单处理一下  你会感觉还是上一台waf好了  起码能防住部分sb
+ 
