@@ -3,14 +3,17 @@
 使用下列推荐设置来获得较好的性能：
 
 
-opcache.memory_consumption=128
+[opcache]
+zend_extension=opcache.so
+opcache.enable=1
+opcache.memory_consumption=${Memory_limit}
 opcache.interned_strings_buffer=8
 opcache.max_accelerated_files=4000
 opcache.revalidate_freq=60
+;opcache.save_comments=0
 opcache.fast_shutdown=1
 opcache.enable_cli=1
-opcache.save_comments=0
-
+;opcache.optimization_level=0
 
 你也可以禁用 opcache.save_comments 并且启用 opcache.enable_file_override。 需要提醒的是，在生产环境中使用上述配置之前，必须经过严格测试。 因为上述配置存在一个已知问题，它会引发一些框架和应用的异常， 尤其是在存在文档使用了备注注解的时候。
 
