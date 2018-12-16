@@ -155,3 +155,63 @@ chdir =
 catch_workers_output = yes
 
 #重定向运行过程中的stdout和stderr到主要的错误日志文件中. 如果没有设置, stdout 和 stderr 将会根据FastCGI的规则被重定向到 /dev/null . 默认值: 空.
+
+
+1）php-fpm进程分配
+
+在之前的文章中就说过了。在fasgcgi模式下，php会启动多个php-fpm进程，来接收nginx发来的请求，那是不是进程越多，速度就越快呢？这可不一定！得根据我们的机器配置和业务量来决定。
+
+我们先来看下，设定进程的配置在哪里？
+
+pm = static | dynamic | ondemand
+
+pm可以设置成这样3种，我们用的最多的就上前面2种。
+
+pm = static模式
+
+pm = static 表示我们创建的php-fpm子进程数量是固定的，那么就只有pm.max_children = 50这个参数生效。你启动php-fpm的时候就会一起全部启动51(1个主＋50个子)个进程，颇为壮观。
+
+pm = dynamic模式
+
+pm = dynamic模式，表示启动进程是动态分配的，随着请求量动态变化的。他由pm.max_children，pm.start_servers，pm.min_spare_servers，pm.max_spare_servers 这几个参数共同决定。
+
+上面已经讲过，这里再重申一下吧：
+
+pm.max_children ＝ 50是最大可创建的子进程的数量。必须设置。这里表示最多只能50个子进程。
+
+pm.start_servers = 20随着php-fpm一起启动时创建的子进程数目。默认值：min_spare_servers + (max_spare_servers – min_spare_servers) / 2。这里表示，一起启动会有20个子进程。
+
+pm.min_spare_servers = 10
+
+设置服务器空闲时最小php-fpm进程数量。必须设置。如果空闲的时候，会检查如果少于10个，就会启动几个来补上。
+
+pm.max_spare_servers = 30
+
+设置服务器空闲时最大php-fpm进程数量。必须设置。如果空闲时，会检查进程数，多于30个了，就会关闭几个，达到30个的状态。
+到底选择static还数dynamic?
+
+很多人恐惧症来袭，不知道选什么好？
+
+一般原则是：动态适合小内存机器，灵活分配进程，省内存。静态适用于大内存机器，动态创建回收进程对服务器资源也是一种消耗。
+
+如果你的内存很大，有8-20G，按照一个php-fpm进程20M算，100个就2G内存了，那就可以开启static模式。如果你的内存很小，比如才256M，那就要小心设置了，因为你的机器里面的其他的进程也算需要占用内存的，所以设置成dynamic是最好的，比如：pm.max_chindren = 8, 占用内存160M左右，而且可以随时变化，对于一半访问量的网站足够了。
+
+2）慢日志查询
+
+我们有时候会经常饱受500,504问题困扰。当nginx收到如上错误码时，可以确定后端php-fpm解析php出了某种问题，比如，执行错误，执行超时。
+
+这个时候，我们是可以开启慢日志功能的。
+
+slowlog = /usr/local/var/log/php-fpm.log.slow
+
+request_slowlog_timeout = 15s
+
+当一个请求该设置的超时时间15秒后，就会将对应的PHP调用堆栈信息完整写入到慢日志中。
+
+php-fpm慢日志会记录下进程号，脚本名称，具体哪个文件哪行代码的哪个函数执行时间过长：
+
+[21-Nov-2013 14:30:38] [pool www] pid 11877
+script_filename = /usr/local/lnmp/nginx/html/www.quancha.cn/www/fyzb.php
+[0xb70fb88c] file_get_contents() /usr/local/lnmp/nginx/html/www.quancha.cn/www/fyzb.php:2
+
+通过日志，我们就可以知道第2行的file_get_contents 函数有点问题，这样我们就能追踪问题了。
