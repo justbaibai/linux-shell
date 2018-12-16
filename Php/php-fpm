@@ -1,8 +1,65 @@
+ cat > ${php_install_dir}/etc/php-fpm.conf <<EOF
+;;;;;;;;;;;;;;;;;;;;;
+; FPM Configuration ;
+;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;
+; Global Options ;
+;;;;;;;;;;;;;;;;;;
+[global]
+pid = run/php-fpm.pid
+error_log = log/php-fpm.log
+log_level = warning
+emergency_restart_threshold = 30
+emergency_restart_interval = 60s
+process_control_timeout = 5s
+daemonize = yes
+;;;;;;;;;;;;;;;;;;;;
+; Pool Definitions ;
+;;;;;;;;;;;;;;;;;;;;
+[${run_user}]
+listen = /dev/shm/php-cgi.sock
+listen.backlog = -1
+listen.allowed_clients = 127.0.0.1
+listen.owner = ${run_user}
+listen.group = ${run_user}
+listen.mode = 0666
+user = ${run_user}
+group = ${run_user}
+pm = dynamic
+pm.max_children = 12
+pm.start_servers = 8
+pm.min_spare_servers = 6
+pm.max_spare_servers = 12
+pm.max_requests = 2048
+pm.process_idle_timeout = 10s
+request_terminate_timeout = 120
+request_slowlog_timeout = 0
+pm.status_path = /php-fpm_status
+slowlog = log/slow.log
+rlimit_files = 51200
+rlimit_core = 0
+catch_workers_output = yes
+;env[HOSTNAME] = $HOSTNAME
+env[PATH] = /usr/local/bin:/usr/bin:/bin
+env[TMP] = /tmp
+env[TMPDIR] = /tmp
+env[TEMP] = /tmp
+EOF
+
+
+
+
+
+
+
+
+
+
+
 pid = run/php-fpm.pid
 
 #pid设置，默认在安装目录中的var/run/php-fpm.pid，建议开启
 
- 
 
 error_log = log/php-fpm.log
 
