@@ -10,7 +10,7 @@ cat /var/lib/nfs/etab
 #客户端同样需要启动portmap,centos6之后是rpcbind
 
 yum install -y  rpcbind nfs-utils
-# nfs-utils 可以不安装  showmount用不了
+#nfs-utils 可以不安装  showmount用不了
 service  (portmap|rpcbind)  start
 
 #showmount -e (ip)  #扫描服务器共享信息
