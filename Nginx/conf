@@ -103,6 +103,9 @@ http
     #在需要缓存的地方加  proxy_cache one
 
     fastcgi_cache_path /data/cgi/cache  levels=1:2 keys_zone=one:10m inactive=5m;
+    用的地方加
+    fastcgi_cache one;
+    
 
 
 
