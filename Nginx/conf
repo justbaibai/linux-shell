@@ -156,19 +156,19 @@ http
     keepalive_timeout 120;
 
     #FastCGI相关参数是为了改善网站的性能：减少资源占用，提高访问速度。下面参数看字面意思都能理解。
-    fastcgi_connect_timeout 300;
-    fastcgi_send_timeout 300;
-    fastcgi_read_timeout 300;
-    fastcgi_buffer_size 64k;
-    fastcgi_buffers 4 64k;
-    fastcgi_busy_buffers_size 128k;
-    fastcgi_temp_file_write_size 128k;
+    fastcgi_connect_timeout 300;  Nginx服务器和后端FastCGI服务器连接的超时时间
+    fastcgi_send_timeout 300;    # Nginx允许FastCGI服务器返回数据的超时时间，即在规定时间内后端服务器必须传完所有的数据，否则Nginx将断开这个连接
+    fastcgi_read_timeout 300;  # Nginx从FastCGI服务器读取响应信息的超时时间，表示连接建立成功后，Nginx等待后端服务器的响应时间
+    fastcgi_buffer_size 64k;  # Nginx FastCGI 的缓冲区大小，用来读取从FastCGI服务器端收到的第一部分响应信息的缓冲区大小
+    fastcgi_buffers 4 64k;  # 设定用来读取从FastCGI服务器端收到的响应信息的缓冲区大小和缓冲区数量
+    fastcgi_busy_buffers_size 128k;  # 用于设置系统很忙时可以使用的 proxy_buffers 大小
+    fastcgi_temp_file_write_size 128k;# FastCGI 临时文件的大小
 
     #gzip模块设置
     gzip on; #开启gzip压缩输出
     gzip_min_length 1k;    #最小压缩文件大小
     gzip_disable "MSIE [1-6]\.";#避免假死
-    gzip_buffers 4 16k;    #压缩缓冲区
+    gzip_buffers 4 16k;    #压缩缓冲区 表示申请4个16k的内存空间缓存
     gzip_http_version 1.0;    #压缩版本（默认1.1，前端如果是squid2.5请使用1.0）做反代时一定要改成1.0，反代默认和后端用http1.0，而1.0默认不支持keepalive 有可能出现502
     gzip_comp_level 2;    #压缩等级
     gzip_types text/plain application/x-javascript text/css application/xml;    #压缩类型，默认就已经包含textml，所以下面就不用再写了，写上去也不会有问题，但是会有一个warn。
