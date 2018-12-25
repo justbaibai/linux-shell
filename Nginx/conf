@@ -368,6 +368,7 @@ http
                  '"upstream_status":"$upstream_status",'
                  '"http_user_agent":"$http_user_agent" }';
         #然后在/etc/nginx/conf.d/server.conf虚拟主机文件中，引用”json”这个日志格式，看看日志信息：
+        #mkdir -p  /var/log/nginx/
          access_log /var/log/nginx/access.log json;    # 这是我编译时默认使用的日志文件路径;
          #重新加载nginx，然后访问日志文件看看日志信息效果如下所示：
          {"timestamp":"2017-12-22T11:31:54+08:00",
