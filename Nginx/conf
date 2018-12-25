@@ -279,6 +279,9 @@ http
             #fastcgi_cache one;
             fastcgi_pass 127.0.0.1:9000;
             fastcgi_index index.php;
+            fastcgi_cache_key "$scheme$request_method$host$request_uri";
+            fastcgi_cache_use_stale error timeout invalid_header http_500;
+             fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
             include fastcgi.conf;
             #fastcgi_cache_valid 200 302 1h;  #不缓存这个可能没有设置；
             #fastcgi_cache_valid 301 1d;
