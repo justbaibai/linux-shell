@@ -45,8 +45,17 @@ events
     #单个进程最大连接数（最大连接数=连接数*进程数）
     #根据硬件调整，和前面工作进程配合起来用，尽量大，但是别把cpu跑到100%就行。每个进程允许的最多连接数，理论上每台nginx服务器的最大连接数为。
     worker_connections 65535;
+}
 
-    #keepalive超时时间。
+   
+
+
+
+#设定http服务器，利用它的反向代理功能提供负载均衡支持
+http
+{
+
+     #keepalive超时时间。
     keepalive_timeout 60;
 
     #客户端请求头部的缓冲区大小。这个可以根据你的系统分页大小来设置，一般一个请求头的大小不会超过1k，不过由于一般系统分页都要大于1k，所以这里设置为分页大小。
@@ -69,13 +78,12 @@ events
 
     #语法:open_file_cache_errors on | off 默认值:open_file_cache_errors off 使用字段:http, server, location 这个指令指定是否在搜索一个文件是记录cache错误.
     open_file_cache_errors on;
-}
 
 
 
-#设定http服务器，利用它的反向代理功能提供负载均衡支持
-http
-{
+
+
+    
     #包含多个server 别*.conf  以域名做conf 共用一个http 出问题好排查 直接注释就行
     #include  /data/conf/baibai.conf
     #mkdir -p /data/conf
