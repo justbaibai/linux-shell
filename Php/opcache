@@ -15,6 +15,8 @@ opcache.fast_shutdown=1
 opcache.enable_cli=1
 ;opcache.optimization_level=0
 
+cat > /usr/local/php/etc/php.d/02-opcache.ini 
+
 你也可以禁用 opcache.save_comments 并且启用 opcache.enable_file_override。 需要提醒的是，在生产环境中使用上述配置之前，必须经过严格测试。 因为上述配置存在一个已知问题，它会引发一些框架和应用的异常， 尤其是在存在文档使用了备注注解的时候。
 
 以下是opcache的配置说明，其中给有值得都是默认配置：
