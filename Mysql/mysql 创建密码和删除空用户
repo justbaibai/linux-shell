@@ -6,4 +6,4 @@ dbrootpwd=123456
  /usr/local/mysql/bin/mysql -uroot -p${dbrootpwd} -e "delete from mysql.db where User='';"
  /usr/local/mysql/bin/mysql -uroot -p${dbrootpwd} -e "delete from mysql.proxies_priv where Host!='localhost';"
  /usr/local/mysql/bin/mysql -uroot -p${dbrootpwd} -e "drop database test;"
-/usr/local/mysql/bin/mysql -uroot -p${dbrootpwd} -e "reset master;"
+#/usr/local/mysql/bin/mysql -uroot -p${dbrootpwd} -e "reset master;"主从
