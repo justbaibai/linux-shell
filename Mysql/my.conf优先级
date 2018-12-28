@@ -1,0 +1,1 @@
+也就是先读取/etc/my.cnf,再读取/etc/mysql/my.cnf，接着读取安装目录下面的my.cnf，最后读取/home/USERNMAE下面的my.cnf.
