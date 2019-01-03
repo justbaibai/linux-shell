@@ -1,0 +1,11 @@
+
+配置-应用-zabbix
+vi /etc/zabbix/zabbix_server.conf
+查看AlertScriptsPath
+cd /usr/local/zabbix/share/zabbix/alertscripts/
+wget http://www.onealert.com/agent/release/oneitsm_zabbix_release-1.2.0.tar.gz
+tar -zxf oneitsm_zabbix_release-1.2.0.tar.gz
+cd oneitsm/bin
+bash install.sh 给的那个
+#的重新启动zabbix才行  要不然不识别
+/etc/init.d/zabbix_server restart
