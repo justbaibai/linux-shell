@@ -1,0 +1,45 @@
+控制面板-->字体-->选择一种中文字库例如“楷体”（simkai.ttf）放到里面
+[root@localhost fonts]# pwd
+/usr/local/nginx/html/fonts
+[root@localhost fonts]# ls
+DejaVuSans.ttf
+sed -i 's/DejaVuSans/simkai/g' /usr/local/nginx/html/include/defines.inc.php
+/usr/local/nginx/html/include/defines.inc.php
+
+字符集真心是坑啊   建议在my.cnf里开始安mysql就设置好   
+写中文报错  应该是字符集不同  注意拉丁和utf8  
+SHOW VARIABLES LIKE '%char%';
+一、character_set_client
+　　主要用来设置客户端使用的字符集。
+
+二、character_set_connection
+　　主要用来设置连接数据库时的字符集，如果程序中没有指明连接数据库使用的字符集类型则按照这个字符集设置。
+
+三、character_set_database
+　　主要用来设置默认创建数据库的编码格式，如果在创建数据库时没有设置编码格式，就按照这个格式设置。
+
+四、character_set_filesystem
+　　文件系统的编码格式，把操作系统上的文件名转化成此字符集，即把 character_set_client转换character_set_filesystem， 默认binary是不做任何转换的。
+
+五、character_set_results
+　　数据库给客户端返回时使用的编码格式，如果没有指明，使用服务器默认的编码格式。
+
+六、character_set_server
+　　服务器安装时指定的默认编码格式，这个变量建议由系统自己管理，不要人为定义。
+
+七、character_set_system
+　　数据库系统使用的编码格式，这个值一直是utf8，不需要设置，它是为存储系统元数据的编码格式。
+
+八、character_sets_dir
+　　这个变量是字符集安装的目录。
+
+在启动mysql后，我们只关注下列变量是否符合我们的要求
+character_set_client
+character_set_connection
+character_set_database
+character_set_results
+character_set_server
+下列三个系统变量我们不需要关心，不会影响乱码等问题
+character_set_filesystem
+character_set_system
+character_sets_dir
