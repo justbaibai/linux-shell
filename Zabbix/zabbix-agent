@@ -1,0 +1,5 @@
+[root@localhost zabbix_agentd.d]# vi listenport.conf
+
+UserParameter=login-user,netstat -ant |grep LISTEN|wc -l
+
+
