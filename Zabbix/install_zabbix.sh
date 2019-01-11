@@ -9,6 +9,7 @@ useradd -g zabbix zabbix
 /usr/local/mysql/bin/mysql -uroot -p123456 -e "flush privileges;"
 cd /usr/local/src && tar xf zabbix-4.0.3.tar.gz
 cd /usr/local/src/zabbix-4.0.3 && ./configure --prefix=/usr/local/zabbix-4.0.3 --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
+#zabbix 端开启java监听的功能，在编译安装的zabbix里面使用--zabbix-java开启，rpm安装的要安装zabbix-java-gateway包，此包要和zabbix server版本相对应。
 make && make install
 ln -s /usr/local/zabbix-4.0.3/ /usr/local/zabbix
 cd /usr/local/src/zabbix-4.0.3/database/mysql
