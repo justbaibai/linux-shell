@@ -1,0 +1,51 @@
+
+wget https://dl.grafana.com/oss/release/grafana-5.4.2-1.x86_64.rpm
+yum install initscripts fontconfig -y
+sudo yum localinstall grafana-5.4.2-1.x86_64.rpm
+service grafana-server start
+grafana-cli plugins install alexanderzobnin-zabbix-app
+service grafana-server restart
+
+http://ip/zabbix/api_jsonrpc.php
+用api
+grafana-cli plugins install grafana-piechart-panel
+---------------------------------------------------
+安装其他图形插件
+grafana-cli plugins install grafana-clock-panel
+#钟表形展示
+grafana-cli plugins install briangann-gauge-panel
+#字符型展示
+grafana-cli plugins install natel-discrete-panel
+#服务器状态
+grafana-cli plugins install vonage-status-panel
+
+如下设置变量"group"，其中query的匹配原则
+*                                  returns all groups
+*.*                               returns all hosts (from all groups)
+Servers.*                    returns all hosts in group Servers
+Servers.*.*                  returns all applications in group Servers
+Servers.*.*.*               returns all items from hosts in group Servers
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+温馨提示：如果是针对某一个主机群组的模板，group的Query可以不需填写*，可以直接写明组名。比如：
+group
+Query：*
+
+host
+Query：$group.*
+
+application
+Query: $group.$host.*
+
+iteams
+Query: $group.$host.$application.*
+
+
+Variables > New
+name  如上
+Data  zabbix      refresh  On Dash load
+
+Query:如上
+
+mu
+incl  两个选对号
