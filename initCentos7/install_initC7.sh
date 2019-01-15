@@ -30,7 +30,7 @@ DefaultLimitCORE=infinity
 DefaultLimitNOFILE=65535
 DefaultLimitNPROC=65535
 " >>/etc/systemd/system.conf
-
+systemctl disable firewalld
 systemctl stop firewalld
 echo "start reboot"
 sleep 5s
