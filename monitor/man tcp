@@ -1,0 +1,2 @@
+发现 没有man tcp
+yum -y install man-pages
