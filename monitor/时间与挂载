@@ -1,0 +1,35 @@
+top
+cpu t
+men m
+crt  timeout
+选项 会话 终端 发送协议
+
+
+timedatectl      status   显示当前时间信息
+                 set-time  设定当前时间
+                 set-timezone 设定当前时区
+                 set-local-rtc  设定bios时间
+
+ntpdate time.windows.com
+timedatectl  set-timezone  Asia/Shanghai
+hwclock
+ntpdate -u ntp.api.bz
+fdisk命令参数介绍
+
+     p、打印分区表。
+
+     n、新建一个新分区。
+
+     d、删除一个分区。
+
+     m、输出菜单
+
+     q、退出不保存。
+
+     w、把分区写进分区表，保存并退出
+之后要partprobe 通知内核要不然的reboot
+partprobe
+mkfs.xfs /dev/sda4
+df -hT
+ mount /dev/sda4 /data
+gdisk
