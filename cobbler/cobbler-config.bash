@@ -41,6 +41,8 @@ cp /etc/cobbler/settings{,.ori}  # 备份
 $1$cobbler$sqDDOBeLKJVmxTCZr52/11
  vim /etc/cobbler/settings 
 default_password_crypted: "$1$cobbler$sqDDOBeLKJVmxTCZr52/11"
+#sed -i 's#\$1\$mF86\/11WvcIcX2t6crBz2onWxyac\.#\$1\$cobbler\$sqDDOBeLKJVmxTCZr52\/11#g' /etc/cobbler/settings 
+
 # server，Cobbler服务器的IP。
 sed -i 's/server: 127.0.0.1/server: 10.0.0.7/' /etc/cobbler/settings
 # next_server，如果用Cobbler管理DHCP，修改本项，作用不解释，看kickstart。
