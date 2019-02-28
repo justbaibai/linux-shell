@@ -76,6 +76,13 @@ cobbler check
      #option domain-name-servers 10.0.3.1;
      #option subnet-mask         255.255.255.0;
      #range dynamic-bootp        10.0.3.160 10.0.3.165;
+     
+sed -i 's#192\.168\.1\.0#10\.0\.3\.0#g' /etc/cobbler/dhcp.template
+sed -i 's#192\.168\.1\.5#10\.0\.3\.1#g' /etc/cobbler/dhcp.template
+sed -i 's#192\.168\.1\.1#10\.0\.3\.1#g' /etc/cobbler/dhcp.template
+sed -i 's#192\.168\.1\.100#10\.0\.3\.160#g' /etc/cobbler/dhcp.template
+sed -i 's#192\.168\.1\.254#10\.0\.3\.168#g' /etc/cobbler/dhcp.template
+
 
 # 同步最新cobbler配置，它会根据配置自动修改dhcp等服务。
  cobbler sync   # 同步所有配置，可以仔细看一下sync做了什么。
