@@ -12,7 +12,8 @@ yum install cobbler  pykickstart httpd dhcp tftp-server -y
 #tftp-server              #tftp服务
 
 
-systemctl start cobbler
+#systemctl start cobbler
+systemctl start cobblerd
 systemctl start httpd
 #httpd: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
 vim /etc/httpd/conf/httpd.conf #添加以下一行
