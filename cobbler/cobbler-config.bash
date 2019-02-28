@@ -178,7 +178,7 @@ MENU TITLE Cobbler | Welcome to Cobbler
 #查看安装镜像文件信息
  cobbler distro report --name=CentOS-7.4-x86_64
  #centos7 的eth0
- 
+ cobbler profile edit --name=CentOS-7.4-x86_64 --kopts='net.ifnames=0 biosdevname=0' --kickstart=/var/lib/cobbler/kickstarts/CentOS-7.4-x86_64.ks
  cobbler profile edit --name=CentOS-7.1-x86_64 --kopts='net.ifnames=0 biosdevname=0'
  cobbler profile report CentOS-7.4-x86_64
  
