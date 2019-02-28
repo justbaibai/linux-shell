@@ -58,6 +58,7 @@ COPYING.elilo     COPYING.yaboot  grub-x86_64.efi  menu.c32    README
 COPYING.syslinux  elilo-ia64.efi  grub-x86.efi     pxelinux.0  yaboot
  vi /etc/xinetd.d/tftp
  'disable' 的yes改成 'no' 
+ #sed -i 's#\tdisable\t\t\t= yes#\tdisable\t\t\t= no#g' /etc/xinetd.d/tftp
  systemctl start tftp.socket
  systemctl start tftp.service
  systemctl start cobbler
