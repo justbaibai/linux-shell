@@ -89,6 +89,8 @@ sed -i 's#192\.168\.1\.254#10\.0\.3\.168#g' /etc/cobbler/dhcp.template
  #挂载镜像并导入镜像
  
  mount /dev/cdrom /mnt
+# mkdir /mnt/cdrom -p
+# mount -t auto /dev/cdrom /mnt
 cobbler import --path=/mnt/ --name=CentOS-6.9-x86_64 --arch=x86_64
 
 # --path 镜像路径
