@@ -1,0 +1,123 @@
+使用 Cobbler，您无需进行人工干预即可安装机器。Cobbler 设置一个 PXE 引导环境（它还可使用yaboot 支持 PowerPC），并控制与安装相关的所有方面，比如网络引导服务（DHCP 和 TFTP）与存储库镜像。当希望安装一台新机器时，Cobbler 可以：
+
+使用一个以前定义的模板来配置 DHCP 服务（如果启用了管理 DHCP）
+
+将一个存储库（yum 或 rsync）建立镜像或解压缩一个媒介，以注册一个新操作系统
+
+在 DHCP 配置文件中为需要安装的机器创建一个条目，并使用您指定的参数（IP 和 MAC 地址）
+
+在 TFTFP 服务目录下创建适当的 PXE 文件
+
+重新启动 DHCP 服务以反映更改
+
+重新启动机器以开始安装（如果电源管理已启用）
+
+
+
+Cobbler加载
+
+Server端：
+
+第一步，启动Cobbler服务
+第二步，进行Cobbler错误检查，执行cobbler check命令
+第三步，进行配置同步，执行cobbler sync命令
+第四步，复制相关启动文件文件到TFTP目录中
+第五步，启动DHCP服务，提供地址分配
+第六步，DHCP服务分配IP地址
+第七步，TFTP传输启动文件
+第八步，Server端接收安装信息
+第九步，Server端发送ISO镜像与Kickstart文件
+Client端：
+
+第一步，客户端以PXE模式启动
+第二步，客户端获取IP地址
+第三步，通过TFTP服务器获取启动文件
+第四步，进入Cobbler安装选择界面
+第五步，客户端确定加载信息
+第六步，根据配置信息准备安装系统
+第七步，加载Kickstart文件
+第八步，传输系统安装的其它文件
+第九步，进行安装系统
+
+pxe 原理
+事实上把PXE称作是一种引导方式而不是安装方式似乎更加准确，PXE(Pre-boot Execution Environment)是由Intel设计的协议，它可以使计算机通过网络启动，但是有一个前提条件是计算机的网卡必须具有引导功能，这个网卡中要有一个PXE客户端。当计算机POST自检成功以后，BIOS把网卡中ROM的PXE客户端调入内存执行，PXE客户端通过网络中的DHCP服务器获取一个IP地址，拿到IP地址以后PXE继续引导计算机与网络中的TFTP客户端建立连接，从而从TFTP服务器中获取开机引导文件之后请求并下载安装需要的文件。在这个过程中需要一台服务器来提供启动文件、安装文件、以及安装过程中的自动应答文件等。
+原理介绍
+
+Client向PXE Server上的DHCP发送IP地址请求消息，DHCP检测Client是否合法（主要是检测Client的网卡MAC地址），如果合法则返回Client的IP地址，同时将启动文件pxelinux.0的位置信息一并传送给Client
+Client向PXE Server上的TFTP发送获取pxelinux.0请求消息，TFTP接收到消息之后再向Client发送pxelinux.0大小信息，试探Client是否满意，当TFTP收到Client发回的同意大小信息之后，正式向Client发送pxelinux.0
+Client执行接收到的pxelinux.0文件
+Client向TFTP Server发送针对本机的配置信息文件（在TFTP服务的pxelinux.cfg目录下，这是系统菜单文件，格式和isolinux.cfg格式一样，功能也是类似），TFTP将配置文件发回Client，继而Client根据配置文件执行后续操作。
+Client向TFTP发送Linux内核请求信息，TFTP接收到消息之后将内核文件发送给Client
+Client向TFTP发送根文件请求信息，TFTP接收到消息之后返回Linux根文件系统
+Client启动Linux内核
+Client下载安装源文件，读取自动化安装脚本
+
+
+Cobbler工作流程
+
+client裸机配置了从网络启动后，开机后会广播包请求DHCP服务器 （cobbler server）发送其分配好的一个IP
+DHCP服务器（cobbler server）收到请求后发送responese，包括其ip地址
+client裸机拿到ip后再向cobbler server发送请求OS引导文件的请求
+cobbler server告诉裸机OS引导文件的名字和TFTP server的ip和 port
+client裸机通过上面告知的TFTP server地址通信，下载引导文件
+client裸机执行执行该引导文件，确定加载信息，选择要安装的os， 期间会再向cobbler server请求kickstart文件和os image
+cobbler server发送请求的kickstart和os iamge
+client裸机加载kickstart文件
+client裸机接收os image，安装该os image
+
+
+Cobbler集成的服务
+PXE服务支持
+DHCP服务管理
+DNS服务管理(可选bind,dnsmasq)
+电源管理
+Kickstart服务支持
+YUM仓库管理
+TFTP(PXE启动时需要)
+Apache(提供kickstart的安装源，并提供定制化的kickstart配置)
+3.4配置目录
+配置文件目录：
+/etc/cobbler
+/etc/cobbler/settings : cobbler 主配置文件
+/etc/cobbler/iso/: iso模板配置文件
+/etc/cobbler/pxe: pxe模板文件
+/etc/cobbler/power: 电源配置文件
+/etc/cobbler/user.conf: web服务授权配置文件
+/etc/cobbler/users.digest: web访问的用户名密码配置文件
+/etc/cobbler/dhcp.template : dhcp服务器的的配置末班
+/etc/cobbler/dnsmasq.template : dns服务器的配置模板
+/etc/cobbler/tftpd.template : tftp服务的配置模板
+/etc/cobbler/modules.conf : 模块的配置文件
+数据目录：
+/var/lib/cobbler/config/: 用于存放distros，system，profiles 等信 息配置文件
+/var/lib/cobbler/triggers/: 用于存放用户定义的cobbler命令
+/var/lib/cobbler/kickstart/: 默认存放kickstart文件
+/var/lib/cobbler/loaders/: 存放各种引导程序  镜像目录
+/var/www/cobbler/ks_mirror/: 导入的发行版系统的所有数据
+/var/www/cobbler/images/ : 导入发行版的kernel和initrd镜像用于 远程网络启动
+/var/www/cobbler/repo_mirror/: yum 仓库存储目录
+日志目录：
+/var/log/cobbler/installing: 客户端安装日志
+/var/log/cobbler/cobbler.log : cobbler日志
+
+命令介绍
+cobbler commands介绍
+cobbler check 核对当前设置是否有问题
+cobbler list 列出所有的cobbler元素
+cobbler report 列出元素的详细信息
+cobbler sync 同步配置到数据目录,更改配置最好都要执行下
+cobbler reposync 同步yum仓库
+cobbler distro 查看导入的发行版系统信息
+cobbler system 查看添加的系统信息
+cobbler profile 查看配置信息
+
+/etc/cobbler/settings中重要的参数设置
+default_password_crypted: "$1$gEc7ilpP$pg5iSOj/mlxTxEslhRvyp/"
+manage_dhcp：1
+manage_tftpd：1
+pxe_just_once：1
+next_server：< tftp服务器的 IP 地址>
+server：
+
+
+
