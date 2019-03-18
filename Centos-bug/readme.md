@@ -24,7 +24,7 @@ soft lockup 和 hard lockup，它们的唯一区别是 hard lockup 发生在CPU�
 软狗
 单个cpu检测线程是否正常调度。
 一般软狗的正常流程如下（假设软狗触发的时间为20s）
-
+<img src="https://github.com/justbaibai/linux-shell/blob/master/img/20170430170428338.png">
 
 
 可能产生软狗的原因： 
@@ -36,6 +36,8 @@ soft lockup 和 hard lockup，它们的唯一区别是 hard lockup 发生在CPU�
 NMI watchdog
 单个CPU检测中断是否能够正常上报 
 当CPU处于关中断状态达到一定时间会被判定进入hard lockup
+
+<img src="https://github.com/justbaibai/linux-shell/blob/master/img/20170430170510093.png">
 
 
 
