@@ -5,10 +5,13 @@ NMI watchdog: BUG: soft lockup - CPU#0 stuck for 24s! [chronyd:500]
 近期在服务器跑大量高负载程序，造成cpu soft lockup。如果确认不是软件的问题。
 解决办法:
 #追加到配置文件中
+
 echo 30 > /proc/sys/kernel/watchdog_thresh 
+
 #查看
 [root@git-node1 data]# tail -1 /proc/sys/kernel/watchdog_thresh
 30
+
 #临时生效
 sysctl -w kernel.watchdog_thresh=30
 #内核软死锁（soft lockup）bug原因分析
