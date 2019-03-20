@@ -6,7 +6,7 @@ curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-
 wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
  yum repolist
  yum install createrepo yum-utils -y
-
+mkdir /data
  .同步镜像到本地
 显示所有仓库
 reposync -r base
@@ -14,7 +14,7 @@ reposync -r extras
 reposync -r updates
 reposync -r epel
 #createrepo --update
-#reposync -r base -p /data #将已经配置好的阿里仓库镜像内的rpm包拉到本地,b ase为本地已经配
+#reposync -r base -p /data #将已经配置好的阿里仓库镜像内的rpm包拉到本地,base为本地已经配
 
 
 cd base
