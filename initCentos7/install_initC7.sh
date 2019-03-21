@@ -1,5 +1,5 @@
 #!/bin/sh
-yum install -y wget vim dos2unix lrzsz bash-completion
+yum install -y wget vim dos2unix lrzsz bash-completion*
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
 curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
