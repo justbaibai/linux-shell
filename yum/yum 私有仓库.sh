@@ -4,6 +4,8 @@ mkdir bak
 mv CentOS* bak
 curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+reposync -r docker-ce-stable
  yum repolist
  yum install createrepo yum-utils -y
 mkdir /data
@@ -13,6 +15,7 @@ reposync -r base
 reposync -r extras
 reposync -r updates
 reposync -r epel
+reposync -r docker-ce-stable
 #createrepo --update
 #reposync -r base -p /data #将已经配置好的阿里仓库镜像内的rpm包拉到本地,base为本地已经配
 
@@ -24,6 +27,8 @@ createrepo ./
 cd ../updates
 createrepo ./
 cd ../epel
+createrepo ./
+cd ../docker-ce-stable
 createrepo ./
 
 
