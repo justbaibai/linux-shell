@@ -90,3 +90,11 @@ baseurl=http://10.0.3.163/epel
 path=/
 enabled=1
 gpgcheck=0
+
+[docker]
+name=CentOS-docker(GDS)
+baseurl=http://10.0.3.163/docker-ce-stable
+path=/
+enabled=1
+gpgcheck=0
+
