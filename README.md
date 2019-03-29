@@ -29,6 +29,7 @@
 ## :beers: | 贡献
 
 ## :busts_in_silhouette: | 贡献者
+:hankey:  :poop:  :shit:
 
 ## :lipstick: | 赞助
 
