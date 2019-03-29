@@ -25,4 +25,10 @@
 [![weibo](https://github.com/justbaibai/linux-shell/blob/master/ico/weibo.svg)]()
 [![gitter](https://github.com/justbaibai/linux-shell/blob/master/ico/gitter.svg)]()
 
+
+## :beers: | 贡献
+
+## :busts_in_silhouette: | 贡献者
+
+
 关于运维的东西  
