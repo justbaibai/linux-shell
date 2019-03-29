@@ -17,5 +17,11 @@
 
 ## :email:Contact | 联系我:
 
+[![facebook](https://github.com/justbaibai/linux-shell/ico/facebook.svg)]()
+[![qq](https://github.com/justbaibai/linux-shell/ico/qq.svg)]()
+[![qq-group](https://github.com/justbaibai/linux-shell/ico/group.svg)])
+[![blog](https://github.com/justbaibai/linux-shell/ico/linux.svg)]() [![email](https://github.com/justbaibai/linux-shell/ico/email.svg)]()
+[![weibo](https://github.com/justbaibai/linux-shell/ico/weibo.svg)]()
+[![gitter](https://github.com/justbaibai/linux-shell/ico/gitter.svg)]()
 
 关于运维的东西  
