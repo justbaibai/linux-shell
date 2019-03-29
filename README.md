@@ -19,7 +19,7 @@
 
 [![facebook](https://github.com/justbaibai/linux-shell/blob/master/ico/facebook.svg)]()
 [![qq](https://github.com/justbaibai/linux-shell/blob/master/ico/qq.svg)]()
-[![qq-group](https://github.com/justbaibai/linux-shell/blob/master/ico/group.svg)])
+[![qq-group](https://github.com/justbaibai/linux-shell/blob/master/ico/group.svg)]()
 [![blog](https://github.com/justbaibai/linux-shell/blob/master/ico/linux.svg)]() 
 [![email](https://github.com/justbaibai/linux-shell/blob/master/ico/email.svg)]()
 [![weibo](https://github.com/justbaibai/linux-shell/blob/master/ico/weibo.svg)]()
