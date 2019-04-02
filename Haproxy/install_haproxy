@@ -1,0 +1,379 @@
+#!/bin/sh
+任何一个七层的http负载均衡器，都应该具备一个功能：会话保持。
+haproxy提供了3种实现会话保持的方式：
+
+(1).源地址hash;
+(2).设置cookie;
+(3).会话粘性表stick-table;
+
+#git clone https://github.com/haproxy/haproxy.git
+
+wget https://github.com/haproxy/haproxy/releases/tag/v1.9.0
+useradd -M -s /sbin/nologin haproxy
+
+- linux22     for Linux 2.2
+ - linux24     for Linux 2.4 and above (default)
+ - linux24e    for Linux 2.4 with support for a working epoll (> 0.21)
+ - linux26     for Linux 2.6 and above
+ - linux2628   for Linux 2.6.28, 3.x, and above (enables splice and tproxy)
+ - solaris     for Solaris 8 or 10 (others untested)
+ - freebsd     for FreeBSD 5 to 12 (others untested)
+ - netbsd      for NetBSD
+ - osx         for Mac OS/X
+ - openbsd     for OpenBSD 5.7 and above
+ - aix51       for AIX 5.1
+ - aix52       for AIX 5.2
+ - cygwin      for Cygwin
+ - haiku       for Haiku
+ - generic     for any other OS or version.
+ - custom      to manually adjust every setting
+
+ make TARGET=linux31 prefix=/usr/local/haproxy-1.9.0
+make install PREFIX=/usr/local/haproxy-1.9.0
+mkdir /usr/local/haproxy/conf
+cp   /usr/local/src/haproxy-1.9.0/examples/option-http_proxy.cfg /usr/local/haproxy/conf/haproxy.cfg
+
+
+mkdir -p /usr/local/haproxy/conf/ready/tcp
+mkdir -p /usr/local/haproxy/conf/ready/http
+mkdir -p /usr/local/haproxy/conf/enabled/tcp
+mkdir -p /usr/local/haproxy/conf/enabled/http
+mkdir -p /usr/local/haproxy/logs
+mkdir -p /data/wwwlogs/logs
+
+cd /usr/local/haproxy/sbin
+./haproxy -f ../conf/haproxy.cfg -f ../conf/ext1.cfg -f ../conf/ext2.cfg
+主配置：haproxy.cfg
+#configure haproxy.cfg
+global
+    log 127.0.0.1   local0
+    maxconn 4096              #最大连接数
+    chroot /usr/local/haproxy #安装目录
+    uid 99                    #用户nobody
+    gid 99                    #组nobody
+    daemon                    #守护进程运行
+    nbproc 1                  #进程数量
+    pidfile /usr/local/haproxy/logs/haproxy.pid #haproxy pid
+
+defaults
+   log     global
+   mode    http               #7层 http;4层tcp  如果要让haproxy支持虚拟主机，mode 必须设为http
+   option  httplog            #http 日志格式
+   log 127.0.0.1 local6
+   option  httpclose          #主动关闭http通道
+   option  redispatch         #serverId对应的服务器挂掉后,强制定向到其他健康的服务器
+   retries 1
+   option  dontlognull
+   maxconn 2000                     #最大连接数
+   timeout connect      3600000     #连接超时(毫秒)
+   timeout client      3600000      #客户端超时(毫秒)
+   timeout server      3600000      #服务器超时(毫秒)
+
+frontend default
+        option  httplog
+        option  httpclose
+        bind 0.0.0.0:80
+        # 状态页面规则
+        acl haproxy_stats   path_beg /haproxy
+        use_backend haproxy_stats if haproxy_stats
+        # 其他
+        # default_backend default_server
+        # 提升失败的时候的用户体验
+        #errorfile 502 /usr/local/haproxy/html/maintain.html
+        #errorfile 503 /usr/local/haproxy/html/maintain.html
+        #errorfile 504 /usr/local/haproxy/html/maintain.html
+
+# 状态页面
+backend haproxy_stats
+    stats uri /haproxy
+    stats enable
+    stats refresh 60s
+    #stats auth admin:admin  # 状态页面认证配置
+    stats admin if TRUE
+
+②、http 扩展配置文件模板
+
+frontend demo
+        option httplog
+        option httpclose
+        bind 192.168.1.10:80 # 扩展
+        # 域名匹配范例
+        acl is_demo hdr_beg(host) -i demo.oa.com
+        # 正则范例范例
+        acl is_demo_rex hdr_reg(host) -i ^demo[0-9].oa.com$
+        # 路径匹配范例
+        acl is_demo_path path_beg /demo/path
+        use_backend demo_oa_com if is_demo || is_demo_rex ||  is_demo_path
+
+backend http_demo_ext
+        mode http
+        # 额外的一些设置，按需使用
+        option forwardfor
+        option forwardfor header Client-IP
+        option http-server-close
+        option httpclose
+        #balance roundrobin    #负载均衡的方式,轮询方式
+        #balance leastconn     #负载均衡的方式,最小连接
+        balance source         #负载均衡的方式,根据请求的源IP
+        cookie SERVERID insert nocache indirect  # 插入serverid到cookie中,serverid后面可以定义
+        # 健康检查
+        option httpchk HEAD /index.html HTTP/1.1\r\nHost:\ demo.oa.com
+        server x.x.x.x x.x.x.x:80 cookie server1 check inter 2s rise 3 fall 3 weight 3
+        server x.x.x.x x.x.x.x:80 cookie server1 check inter 2s rise 3 fall 3 weight 3
+③、tcp 扩展配置文件模板
+        listen tcp_demo_ext
+            bind 0.0.0.0:3306
+            mode tcp
+            server x.x.x.x x.x.x.x:3306 weight 1 check inter 1s rise 2 fall 2
+            server x.x.x.x x.x.x.x:3306 weight 1 check inter 1s rise 2 fall 2
+
+Ps：多配置模式中，多个 frontend 必须绑定不同的 IP 或者端口，否则数据会串，导致映射到不同的后端而报错。因此，同一个 IP+端口下的映射务必配置到同一个 frontend 模块内。
+
+
+#!/bin/bash
+###################################################################
+#  Haproxy Service Script 1.0.0 Author: Jager <im@zhang.ge>    #
+#  Common Operations(start|stop|restart|mon|test)                 #
+#-----------------------------------------------------------------#
+#  For more information please visit https://zhang.ge/5125.html #
+#  Copyright @2017 zhang.ge. All rights reserved.              #
+###################################################################
+# chkconfig: 35 10 90
+export PATH=/sbin:/usr/sbin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:$PATH
+PROCESS_NAME=haproxy
+BASE_DIR=/usr/local/haproxy
+EXEC=$BASE_DIR/sbin/haproxy
+PID_FILE=$BASE_DIR/logs/haproxy.pid
+DEFAULT_CONF=$BASE_DIR/conf/haproxy.cfg
+MONLOG_PATH="$BASE_DIR/logs/${PROCESS_NAME}_mon.log"
+
+# COLOR print
+COLOR_RED=$(    echo -e "\e[31;49m" )
+COLOR_GREEN=$(  echo -e "\e[32;49m" )
+COLOR_RESET=$(  echo -e "\e[0m"     )
+info() { echo "${COLOR_GREEN}$*${COLOR_RESET}"   ;}
+warn() { echo "${COLOR_RED}$*${COLOR_RESET}"     ;}
+
+do_log()
+{
+    local log_fpath=$1
+    local log_content=$2
+    echo "$(date '+%F %T') $log_content" >> $log_fpath
+}
+
+print_usage()
+{
+    echo
+    info " Usage: $(basename $0) [start|stop|restart|mon|test]"
+    echo
+}
+
+#get Expanding configuration
+ext_configs()
+{
+    CONFIGS=
+    if [[ -d $BASE_DIR/conf/enabled ]];then
+        for FILE in $(find $BASE_DIR/conf/enabled -type l | sort -n)
+        do
+                CONFIGS="$CONFIGS -f $FILE";
+        done
+        echo $CONFIGS
+    else
+        echo
+    fi
+}
+# check process status
+check_process()
+{
+    PID=`get_pid`
+    if ps aux | awk '{print $2}' | grep -qw $PID 2>/dev/null ;then
+        true
+    else
+        false
+    fi
+
+}
+# check Configuration file
+check_conf()
+{
+    $EXEC -c -f $DEFAULT_CONF `ext_configs` >/dev/null 2>&1
+    return $?
+}
+get_pid()
+{
+    if [[ -f $PID_FILE ]];then
+        cat $PID_FILE
+        else
+            warn " $PID_FILE not found!"
+                exit 1
+        fi
+}
+start()
+{
+    echo
+    if check_process;then
+        warn " ${PROCESS_NAME} is already running!"
+    else
+        $EXEC -f $DEFAULT_CONF `ext_configs` && \
+        echo -e " ${PROCESS_NAME} start                        [ `info OK` ]" || \
+        echo -e " ${PROCESS_NAME} start                        [ `warn Failed` ]"
+    fi
+    echo
+}
+
+stop()
+{
+    echo
+    if check_process;then
+        PID=`get_pid`
+        kill -9 $PID >/dev/null 2>&1
+        echo -e " ${PROCESS_NAME} stop                         [ `info OK` ]"
+    else
+        warn " ${PROCESS_NAME} is not running!"
+    fi
+    echo
+}
+
+restart()
+{
+    echo
+    if check_process;then
+        :
+    else
+        warn " ${PROCESS_NAME} is not running! Starting Now..."
+    fi
+    if `check_conf`;then
+        PID=`get_pid`
+        $EXEC -f $DEFAULT_CONF `ext_configs` -st $PID && \
+        echo -e " ${PROCESS_NAME} restart                      [ `info OK` ]" || \
+        echo -e " ${PROCESS_NAME} restart                      [ `warn Failed` ]"
+    else
+        warn " ${PROCESS_NAME} Configuration file is not valid, plz check!"
+        echo -e " ${PROCESS_NAME} restart                      [ `warn Failed` ]"
+    fi
+    echo
+}
+
+mon()
+{
+    if check_process;then
+        info "${PROCESS_NAME} is running OK!"
+        do_log $MONLOG_PATH "${PROCESS_NAME} is running OK!"
+    else
+        start
+        warn " ${PROCESS_NAME} not running, start it!"
+        do_log $MONLOG_PATH "${PROCESS_NAME} not running, plz check"
+    fi
+}
+
+if [[ $# != 1 ]]; then
+    print_usage
+    exit 1
+else
+    case $1 in
+        "start"|"START")
+            start
+        ;;
+        "stop"|"STOP")
+            stop
+        ;;
+        "restart"|"RESTART"|"-r")
+            restart
+        ;;
+        "status"|"STATUS")
+            if check_process;then
+                info "${PROCESS_NAME} is running OK!"
+            else
+                warn " ${PROCESS_NAME} not running, plz check"
+            fi
+        ;;
+        "test"|"TEST"|"-t")
+            echo
+            if check_conf ;then
+                info " Configuration file test Successfully."
+            else
+                warn " Configuration file test failed."
+            fi
+            echo
+        ;;
+        "mon"|"MON"|"-m")
+            mon
+        ;;
+        *)
+        print_usage
+        exit 1
+    esac
+fi
+
+
+启动：service haproxy start
+停止：service haproxy stop
+重载：service haproxy restart
+状态：service haproxy status
+检查：service haproxy test
+监控：service haproxy mon  # 进程自拉起，如有告警通道可自行加入
+
+
+保存为 /usr/local/haproxy/sbin/ctrl.sh，赋可执行权限，如下注册系统服务：
+chmod +x /usr/local/haproxy/sbin/ctrl.sh
+ln -sf /usr/local/haproxy/sbin/ctrl.sh  /etc/init.d/haproxy
+chkconfig haproxy on
+2、配置自拉起
+* * * * * bash /usr/local/haproxy/ctrl.sh mon >/dev/null 2>&1
+
+
+
+global
+	log 127.0.0.1 local0 info
+  maxconn 4096
+	user haproxy
+	group haproxy
+	daemon
+	nbproc 1
+	pidfile /usr/local/haproxy/logs/haproxy.pid
+defaults
+	mode http
+	retries 3
+	timeout connect 10s
+	timeout client 20s
+	timeout server 30s
+	timeout check 5s
+frontend www
+	bind *:80
+	mode	http
+	option	httplog
+#	option	forwardfor
+	option	httpclose
+	log	global
+	default_backend htmpool
+backend htmpool
+	mode	http
+	option	redispatch
+#	option	abortonclose
+	balance	roundrobin
+	cookie	serverid insert nocache indirect
+	option	httpchk GET /index.html
+	server	web1 10.0.3.167:80 cookie server1 weight 6 check inter 2000 rise 2 fall 3
+	server	web2 10.0.3.65:80 cookie server2 weight 6 check inter 2000 rise 2 fall 3
+listen admin_stats
+	bind 0.0.0.0:9188
+	mode http
+	log 127.0.0.1 local0 err
+        stats refresh 30s
+	stats uri /haproxy-status
+	stats realm welcome login\ Haproxy
+	stats auth admin:admin123
+	stats hide-version
+	stats admin if TRUE
+
+
+
+
+mkdir /usr/local/haproxy/logs
+chown haproxy.haproxy /usr/local/haproxy/*
+
+/usr/local/haproxy/sbin/haproxy -f /usr/local/haproxy/conf/baibai.cfg
+
+
+
+http://10.0.3.118:9188/haproxy-status
