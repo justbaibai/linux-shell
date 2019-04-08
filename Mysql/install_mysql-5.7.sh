@@ -2,7 +2,7 @@
 
 wget -P /usr/local/src http://mirrors.ustc.edu.cn/mysql-ftp/Downloads/MySQL-5.7/mysql-5.7.25-linux-glibc2.12-x86_64.tar.gz
 cd /usr/local/src && tar xf mysql-5.7.25-linux-glibc2.12-x86_64.tar.gz
-mv /usr/local/src/mysql-5.6.43-linux-glibc2.12-x86_64 /usr/local/mysql-5.7.25
+mv /usr/local/src/mysql-5.7.25-linux-glibc2.12-x86_64 /usr/local/mysql-5.7.25
 useradd -s /sbin/nologin -M mysql
 chown -R mysql.mysql  /usr/local/mysql-5.7.25/*
 yum -y install autoconf libaio-devel
