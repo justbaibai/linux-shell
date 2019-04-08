@@ -14,6 +14,7 @@ chmod +x /etc/init.d/mysqld
 ln -s /usr/local/mysql-5.7.25/  /usr/local/mysql
 echo "export PATH=/usr/local/mysql/bin:\$PATH" >> /etc/profile.d/mysql.sh
 cat >> /etc/profile << EOF
+/usr/local/mysql/bin/mysql_secure_installation
 # mariadb path
 PATH=\$PATH:/usr/local/mysql/bin
 export PATH
