@@ -28,7 +28,7 @@ useradd -M -s /sbin/nologin haproxy
  - generic     for any other OS or version.
  - custom      to manually adjust every setting
 
- make TARGET=linux31 prefix=/usr/local/haproxy-1.9.0
+ make TARGET=linux31  USE_PCRE=1 USE_OPENSSL=1 USE_ZLIB prefix=/usr/local/haproxy-1.9.0 
 make install PREFIX=/usr/local/haproxy-1.9.0
 mkdir /usr/local/haproxy/conf
 cp   /usr/local/src/haproxy-1.9.0/examples/option-http_proxy.cfg /usr/local/haproxy/conf/haproxy.cfg
