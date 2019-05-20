@@ -8,7 +8,9 @@ make install PREFIX=/usr/local/redis
 #这个以后升级的时候只要修改软连接的指向就行了
 #或者直接用
 cd src/
-
+echo 'vm.overcommit_memory = 1' >>/etc/sysctl.conf
+sysctl vm.overcommit_memory=1
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
 cp /usr/local/redis-5.0.4/redis.conf /usr/local/redis/bin/
 /usr/local/redis/bin/redis-server /usr/local/redis/bin/redis.conf
  /usr/local/redis/bin/redis-cli -h 10.0.3.118
