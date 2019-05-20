@@ -1,7 +1,7 @@
 #!/bin/sh
 wget http://download.redis.io/releases/redis-5.0.4.tar.gz -P /usr/local/
 cd /usr/local/
-tar xf redis-5.0.4.tar.gz
+tar xf redis-5.0.4.tar.gz&&cd redis-5.0.4
 make
 make install PREFIX=/usr/local/redis
 #或者带版本号ln -s  软连接
