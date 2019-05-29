@@ -4,6 +4,7 @@ auth baibai<br>
 常见命令
 
 查看信息：info。
+
 删除所有数据库内容：flushall。
 刷新数据库：flushdb。
 看所有键：KEYS *，使用select num可以查看键值数据。
