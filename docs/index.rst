@@ -97,3 +97,28 @@ Indices and tables
 .. _contributors: contributors.html
 .. _Django: http://djangoproject.com
 .. _`Uni-form`: http://sprawsm.com/uni-form
+
+
+
+
+
+
+Jumpserver 文档
+======================================
+
+目录：
+
+.. toctree::
+   :maxdepth: 2
+
+   introduce
+   step_by_step
+   admin_guide
+   user_guide
+   development
+   contributor
+   contact
+   snapshot
+   faq
+   change_log
+
