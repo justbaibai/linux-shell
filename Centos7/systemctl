@@ -1,0 +1,36 @@
+
+
+/usr/lib/systemd/system
+
+vi baibai.service
+
+[Unit]
+Description=baibai test  # 描述性说明。
+After=network.target
+
+[Service]
+Type=forking  #后台运行
+ExecStart=/bin/sh /baibaistart.sh #ExecStart=指令 参数
+ExecReload=/bin/sh /baibaireload.sh
+ExecStop=/bin/sh /baibaistop.sh
+Privatetmp=true #开启独立的空间
+[Install]
+WantedBy=multi-user.target #多用户级别
+
+
+
+#notify，同样地，与simple相似的配置。顾名思义，该设置会在守护进程启动的时候发送推送消息(通过sd_notify(3))给systemd。
+#simple，这是默认的Type，当Type和BusName配置都没有设置，指定了ExecStart设置后，simple就是默认的Type设置。simple使用ExecStart创建的进程作为服务的主进程。在此设置下systemd会立即启动服务，如果该服务要启动其他服务（simple不会forking），它们的通讯渠道应当在守护进程启动之前被安装好（e.g. sockets,通过sockets激活）。
+#forking，如果使用了这个Type，则ExecStart的脚本启动后会调用fork()函数创建一个进程作为其启动的一部分。当一切初始化完毕后，父进程会退出。子进程会继续作为主进程执行。这是传统UNIX主进程的行为。如果这个设置被指定，建议同时设置PIDFile选项来指定pid文件的路径，以便systemd能够识别主进程。
+比较典型的情况是单元A要求在单元B启动之后再启动。这种设置是通过Unit下面的Requires、After、Before、Wants来调整的。
+Requires=B
+After=B
+
+这段设置表明了A的启动依赖于B，同时有要求在B启动之后启动自己。设置十分简介。需要注意的是，依赖关系通常用在服务（Service）而不是目标（Target）上。
+
+
+systemctl enable xxx.service 开机自启动
+
+
+systemctl list-units --type=service ： 列出正在运行的服务
+

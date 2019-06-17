@@ -1,0 +1,160 @@
+三次握手以及其中的各种状态：
+
+SYN(Synchronize Sequence Numbers)。
+
+同步序列编号
+
+ACK (ACKnowledge Character）
+
+在数据通信传输中，接收站发给发送站的一种传输控制字符。它表示确认发来的数据已经接受无误。
+=================================
+
+client发送syn至server
+
+此时客户端的状态变为SYN_SENT
+
+client(syn=j)====>server
+
+server收到syn,并发送syn+ack到client,
+
+这种过程server状态由listen变为SYN_RECV,并等待客户端再次发来ack数据
+
+client<=========server(syn=k,ack=j+1)
+
+client接收到server发过来的syn+ack,并向服务端发送ACK,服务器接收后由SYN_RECV变为ESTABLISHED
+
+client(ACK(ack=k+1))========>server
+
+此种情况下，服务端在三次握手的变迁是
+
+LISTEN->SYN_RECV ->ESTABLISHED
+
+客户端的三次握手的变迁是
+
+SYN_SENT ->ESTABLISHED
+
+====================================
+
+在这种过程中要注意的
+
+一、首先server有个用来接收client发送的syn并对syn进行排队的队列，如果队列满了，新的请求不被接受。
+
+此队列长度控制参数:
+
+net.ipv4.tcp_max_syn_backlog 
+
+对应文件(/proc/sys/net/ipv4/tcp_max_syn_backlog ) 默认是1024
+view sourceprint?
+1     [root@web]# cat /proc/sys/net/ipv4/tcp_max_syn_backlog
+2     1024
+
+二、然后是SYN-ACK重传：当server向client发送syn+ack没有收到相应，server将重传，然后再重传。。。控制这个重传次数的参数是
+
+tcp_synack_retries
+
+对应文件(/proc/sys/net/ipv4/tcp_synack_retries )默认值是5，对应于180秒左右时间
+view sourceprint?
+1     [root@web ~]# cat /proc/sys/net/ipv4/tcp_synack_retries
+2     5
+view sourceprint?
+关于tcp_synack_retries的英文解释：
+The maximum number of times a SYN/ACK segment for a passive TCP connection will be retransmitted. This number should not be higher than 255. The default value is 5.
+
+备注:与此相对应的client的参数是:
+tcp_syn_retries
+The maximum number of times initial SYNs for an active TCP connection attempt will be retransmitted. This value should not be higher than 255. The default value is 5, which corresponds to approximately 180 seconds.
+
+三、关于tcp_syncookies
+
+SYN Cookie原理及其在Linux内核中的实现
+
+http://www.ibm.com/developerworks/cn/linux/l-syncookie/?ca=dwcn-newsletter-linux
+
+SYN Cookie是对TCP服务器端的三次握手协议作一些修改，专门用来防范SYN Flood攻击的一种手段。它的原理是，在TCP服务器收到TCP SYN包并返回TCP SYN+ACK包时，不分配一个专门的数据区，而是根据这个SYN包计算出一个cookie值。在收到TCP ACK包时，TCP服务器在根据那个cookie值检查这个TCP ACK包的合法性。如果合法，再分配专门的数据区进行处理未来的TCP连接。
+view sourceprint?
+1     [root@web~]# cat /proc/sys/net/ipv4/tcp_syncookies
+2     1
+
+===========================================
+
+典型故障处理
+
+如果服务器syn_recv的条数过多，可以采取的操作是:
+
+减少server==>client重传syn+ack的次数。
+
+加大syn队列长度，防止无法响应新的连接
+view sourceprint?
+1     echo "net.ipv4.tcp_max_syn_backlog = 4096" >>/etc/sysctl.conf
+2     echo "net.ipv4.tcp_synack_retries = 1" >>/etc/sysctl.conf
+3     sysctl -p
+
+当受到syn攻击的时候，启用syn-cookie(默认启用，在/etc/sysctl.conf里本身就有参数配置)
+view sourceprint?
+1     echo 1 >/proc/sys/net/ipv4/tcp_syncookies
+
+=================================================
+
+四次握手
+
+下面说tcp/ip的第四次握手，分析主动关闭和被动关闭两种。
+
+A:因为如果是CLIENT端主动断掉当前连接，那么双方关闭这个TCP连接共需要四个packet：
+
+setup
+Client     --->   FIN（M）   --->   Server
+
+client发送一个FIN给server,（说它不跟你玩了）,client由ESTABLISHED->FIN_WAIT1
+
+Client    <---  ACK(M+1)  <---   Server 
+
+SER VER收到fin后发送ack确认（拿出两人信物），状态由ESTABLISHED->close_wait
+
+
+client收到server的ack确认,只是改变状态ESTABLISHED->FIN_WAIT1->FIN_WAIT2，继续等server发送数据。
+
+Client  <--  FIN(N)    <--  Server
+
+server继续发送FIN到client（好就不玩了吧）,状态ESTABLISHED->close_wait->LAST_ACK,等待client发送ack做最后的确认
+
+Client  -->  ACK(N+1)  -->  Server
+
+client收到FIN,马上发送ack确认,状态ESTABLISHED->FIN_WAIT1->FIN_WAIT2->TIME_WAIT[2MSL超时]->closed
+
+server收到ack确认，状态ESTABLISHED->close_wait->LAST_ACK->CLOSED.
+
+
+
+client关闭连接很好想，有点要搞清楚的是，server端什么时候会发起丢掉连接的操作：
+
+有些是应用程序控制的。nginx.conf为例
+
+keepalive_timeout  0;
+[root@lvs-2 ~]# curl -I http://www.XXX.com
+Connection: close
+
+
+keepalive_timeout  600;
+[root@lvs-2 ~]# curl -I http://www.XXX.com
+Connection: keep-alive
+
+这种规定了连接时间的，到了时间连接会断掉。
+
+如果没有规定的，则按照系统keepalived定时器的设置进行，具体参数如下：
+
+[root@web]# sysctl -a|grep tcp_keepalive
+view sourceprint?
+1     net.ipv4.tcp_keepalive_intvl = 75
+2     net.ipv4.tcp_keepalive_probes = 9
+3     net.ipv4.tcp_keepalive_time = 7200   
+4     连接两端一直没发送数据，间隔120分钟，两小时后开始第一次探测，间隔75秒后第二次探测，探测9次，最后放弃连接。有四种探测的情况，详见
+
+
+
+四种状况其实最后一种没什么意义，能考虑到下面三种就行了
+
+1 client正常，每进行一次通讯，net.ipv4.tcp_keepalive_time重置一次。
+
+2 一直到7200+75*9后也无法获取client反馈信息，则认为client已经关闭并终止连接(连接超时)
+
+3 client重启， 收到探测后返回一个复位（RST）信息。server收到后终止连接（连接被对方复位）

@@ -1,0 +1,118 @@
+cat >> /etc/security/limits.conf <<EOF
+# End of file
+* soft nproc 65535
+* hard nproc 65535
+* soft nofile 65535
+* hard nofile 65535
+EOF
+
+ulimit -n 
+发现yum的和编译的都是65535
+开始演了
+
+[root@localhost ~]# ps -ef |grep nginx
+root       1117      1  0 03:42 ?        00:00:00 nginx: master process /usr/local/nginx/sbin/nginx
+nginx      1118   1117  0 03:42 ?        00:00:00 nginx: worker process
+root       1120   1097  0 03:42 pts/0    00:00:00 grep --color=auto nginx
+
+[root@localhost ~]# cat /proc/1117/limits 
+Limit                     Soft Limit           Hard Limit           Units     
+Max cpu time              unlimited            unlimited            seconds   
+Max file size             unlimited            unlimited            bytes     
+Max data size             unlimited            unlimited            bytes     
+Max stack size            8388608              unlimited            bytes     
+Max core file size        0                    unlimited            bytes     
+Max resident set          unlimited            unlimited            bytes     
+Max processes             65535                65535                processes 
+Max open files            65535                65535                files     
+Max locked memory         65536                65536                bytes     
+Max address space         unlimited            unlimited            bytes     
+Max file locks            unlimited            unlimited            locks     
+Max pending signals       7776                 7776                 signals   
+Max msgqueue size         819200               819200               bytes     
+Max nice priority         0                    0                    
+Max realtime priority     0                    0                    
+Max realtime timeout      unlimited            unlimited            us   
+
+
+
+这个是yum 安装的httpd
+[root@localhost ~]# cat /proc/1156/limits     
+Limit                     Soft Limit           Hard Limit           Units     
+Max cpu time              unlimited            unlimited            seconds   
+Max file size             unlimited            unlimited            bytes     
+Max data size             unlimited            unlimited            bytes     
+Max stack size            8388608              unlimited            bytes     
+Max core file size        0                    unlimited            bytes     
+Max resident set          unlimited            unlimited            bytes     
+Max processes             7776                 7776                 processes 
+Max open files            1024                 4096                 files     
+Max locked memory         65536                65536                bytes     
+Max address space         unlimited            unlimited            bytes     
+Max file locks            unlimited            unlimited            locks     
+Max pending signals       7776                 7776                 signals   
+Max msgqueue size         819200               819200               bytes     
+Max nice priority         0                    0                    
+Max realtime priority     0                    0                    
+Max realtime timeout      unlimited            unlimited            us 
+
+
+
+在CentOS 7 / RHEL 7的系统中，使用Systemd替代了之前的SysV，因此 /etc/security/limits.conf 文件的配置作用域缩小了一些。limits.conf这里的配置，只适用于通过PAM认证登录用户的资源限制，它对systemd的service的资源限制不生效。登录用户的限制，与上面讲的一样，通过 /etc/security/limits.conf 和 limits.d 来配置即可。
+对于systemd service的资源限制，如何配置呢？
+
+全局的配置，放在文件 /etc/systemd/system.conf 和 /etc/systemd/user.conf。 同时，也会加载两个对应的目录中的所有.conf文件 /etc/systemd/system.conf.d/*.conf 和 /etc/systemd/user.conf.d/*.conf
+其中，system.conf 是系统实例使用的，user.conf用户实例使用的。一般的sevice，使用system.conf中的配置即可。systemd.conf.d/*.conf中配置会覆盖system.conf。
+
+
+DefaultLimitCORE=infinity
+DefaultLimitNOFILE=65535
+DefaultLimitNPROC=65535
+
+注意：修改了system.conf后，需要重启系统才会生效。
+
+针对单个Service，也可以设置，以nginx为例。
+编辑 /usr/lib/systemd/system/nginx.service 文件，或者 /usr/lib/systemd/system/nginx.service.d/my-limit.conf 文件，做如下配置：
+
+
+[Service]
+LimitCORE=infinity
+LimitNOFILE=65535
+LimitNPROC=65535
+
+
+最好reboot一下
+
+sudo systemctl daemon-reload
+sudo systemctl restart nginx.service
+
+查看一个进程的limit设置：cat /proc/YOUR-PID/limits
+例如我的一个nginx service的配置效果：
+
+
+$cat /proc/$(cat /var/run/nginx.pid)/limits
+
+$cat /proc/$(cat /var/run/nginx.pid)/limits
+
+顺便提一下，我还被CentOS7自带的/etc/security/limits.d/20-nproc.conf文件坑过，里面默认设置了非root用户的最大进程数为4096，难怪我上次在limits.conf中设置了没啥效果，原来被limit.d目录中的配置覆盖了。
+
+
+root       1137   1106  0 03:56 pts/0    00:00:00 grep --color=auto httpd
+[root@localhost ~]# cat /proc/857/limits     
+Limit                     Soft Limit           Hard Limit           Units     
+Max cpu time              unlimited            unlimited            seconds   
+Max file size             unlimited            unlimited            bytes     
+Max data size             unlimited            unlimited            bytes     
+Max stack size            8388608              unlimited            bytes     
+Max core file size        unlimited            unlimited            bytes     
+Max resident set          unlimited            unlimited            bytes     
+Max processes             65535                65535                processes 
+Max open files            65535                65535                files     
+Max locked memory         65536                65536                bytes     
+Max address space         unlimited            unlimited            bytes     
+Max file locks            unlimited            unlimited            locks     
+Max pending signals       7776                 7776                 signals   
+Max msgqueue size         819200               819200               bytes     
+Max nice priority         0                    0                    
+Max realtime priority     0                    0                    
+Max realtime timeout      unlimited            unlimited            us    

@@ -1,0 +1,312 @@
+ cat > ${php_install_dir}/etc/php-fpm.conf <<EOF
+;;;;;;;;;;;;;;;;;;;;;
+; FPM Configuration ;
+;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;
+; Global Options ;
+;;;;;;;;;;;;;;;;;;
+[global]
+pid = run/php-fpm.pid
+error_log = log/php-fpm.log
+log_level = warning
+emergency_restart_threshold = 30
+emergency_restart_interval = 60s
+process_control_timeout = 5s
+daemonize = yes
+;;;;;;;;;;;;;;;;;;;;
+; Pool Definitions ;
+;;;;;;;;;;;;;;;;;;;;
+[${run_user}]
+listen = /dev/shm/php-cgi.sock
+listen.backlog = -1
+listen.allowed_clients = 127.0.0.1
+listen.owner = ${run_user}
+listen.group = ${run_user}
+listen.mode = 0666
+user = ${run_user}
+group = ${run_user}
+pm = dynamic
+pm.max_children = 12
+pm.start_servers = 8
+pm.min_spare_servers = 6
+pm.max_spare_servers = 12
+pm.max_requests = 2048
+pm.process_idle_timeout = 10s
+request_terminate_timeout = 120
+request_slowlog_timeout = 0
+pm.status_path = /php-fpm_status
+slowlog = log/slow.log
+rlimit_files = 51200
+rlimit_core = 0
+catch_workers_output = yes
+;env[HOSTNAME] = $HOSTNAME
+env[PATH] = /usr/local/bin:/usr/bin:/bin
+env[TMP] = /tmp
+env[TMPDIR] = /tmp
+env[TEMP] = /tmp
+EOF
+
+
+
+
+
+
+
+
+
+
+
+pid = run/php-fpm.pid
+
+#pid设置，默认在安装目录中的var/run/php-fpm.pid，建议开启
+
+
+error_log = log/php-fpm.log
+
+#错误日志，默认在安装目录中的var/log/php-fpm.log
+
+ 
+
+log_level = notice
+
+#错误级别. 可用级别为: alert（必须立即处理）, error（错误情况）, warning（警告情况）, notice（一般重要信息）, debug（调试信息）. 默认: notice.
+
+ 
+
+emergency_restart_threshold = 60
+
+emergency_restart_interval = 60s
+
+#表示在emergency_restart_interval所设值内出现SIGSEGV或者SIGBUS错误的php-cgi进程数如果超过 emergency_restart_threshold个，php-fpm就会优雅重启。这两个选项一般保持默认值。
+
+ 
+
+process_control_timeout = 0
+默认设置为0我想即是不考虑这些响应，即是主进程不考虑子进程是否能响应请求，只要进程存在就直接转发请求。可见在重启php-fpm后，有的子进程已经不能处理请求了。
+    在线上服务器变更php-fpm配置并重启后，重启出现502的问题就解决了。
+
+#设置子进程接受主进程复用信号的超时时间. 可用单位: s(秒), m(分), h(小时), 或者 d(天) 默认单位: s(秒). 默认值: 0.
+
+ 
+
+daemonize = yes
+
+#后台执行fpm,默认值为yes，如果为了调试可以改为no。在FPM中，可以使用不同的设置来运行多个进程池。 这些设置可以针对每个进程池单独设置。
+
+ 
+
+listen = 127.0.0.1:9000
+
+#fpm监听端口，即nginx中php处理的地址，一般默认值即可。可用格式为: 'ip:port', 'port', '/path/to/unix/socket'. 每个进程池都需要设置.
+
+ 
+
+listen.backlog = -1
+
+#backlog数，-1表示无限制，由操作系统决定，此行注释掉就行。backlog含义参考：http://www.3gyou.cc/?p=41
+
+ 
+
+listen.allowed_clients = 127.0.0.1
+
+#允许访问FastCGI进程的IP，设置any为不限制IP，如果要设置其他主机的nginx也能访问这台FPM进程，listen处要设置成本地可被访问的IP。默认值是any。每个地址是用逗号分隔. 如果没有设置或者为空，则允许任何服务器请求连接
+
+ 
+
+listen.owner = www
+
+listen.group = www
+
+listen.mode = 0666
+
+#unix socket设置选项，如果使用tcp方式访问，这里注释即可。
+
+ 
+
+user = www
+
+group = www
+
+#启动进程的帐户和组
+
+ 
+
+pm = dynamic #对于专用服务器，pm可以设置为static。
+
+#如何控制子进程，选项有static和dynamic。如果选择static，则由pm.max_children指定固定的子进程数。如果选择dynamic，则由下开参数决定：
+
+pm.max_children #，子进程最大数
+
+pm.start_servers #，启动时的进程数
+
+pm.min_spare_servers #，保证空闲进程数最小值，如果空闲进程小于此值，则创建新的子进程
+
+pm.max_spare_servers #，保证空闲进程数最大值，如果空闲进程大于此值，此进行清理
+
+ 
+
+pm.max_requests = 1000
+
+#设置每个子进程重生之前服务的请求数. 对于可能存在内存泄漏的第三方模块来说是非常有用的. 如果设置为 '0' 则一直接受请求. 等同于 PHP_FCGI_MAX_REQUESTS 环境变量. 默认值: 0.
+
+ 
+
+pm.status_path = /status
+
+#FPM状态页面的网址. 如果没有设置, 则无法访问状态页面. 默认值: none. munin监控会使用到
+
+ 
+
+ping.path = /ping
+
+#FPM监控页面的ping网址. 如果没有设置, 则无法访问ping页面. 该页面用于外部检测FPM是否存活并且可以响应请求. 请注意必须以斜线开头 (/)。
+
+ 
+
+ping.response = pong
+
+#用于定义ping请求的返回相应. 返回为 HTTP 200 的 text/plain 格式文本. 默认值: pong.
+
+ 
+
+request_terminate_timeout = 0
+
+#设置单个请求的超时中止时间. 该选项可能会对php.ini设置中的'max_execution_time'因为某些特殊原因没有中止运行的脚本有用. 设置为 '0' 表示 'Off'.当经常出现502错误时可以尝试更改此选项。
+
+ 
+
+request_slowlog_timeout = 10s
+
+#当一个请求该设置的超时时间后，就会将对应的PHP调用堆栈信息完整写入到慢日志中. 设置为 '0' 表示 'Off'
+
+ 
+
+slowlog = log/$pool.log.slow
+
+#慢请求的记录日志,配合request_slowlog_timeout使用
+
+ 
+
+rlimit_files = 1024
+
+#设置文件打开描述符的rlimit限制. 默认值: 系统定义值默认可打开句柄是1024，可使用 ulimit -n查看，ulimit -n 2048修改。
+
+ 
+
+rlimit_core = 0
+
+#设置核心rlimit最大限制值. 可用值: 'unlimited' 、0或者正整数. 默认值: 系统定义值.
+
+ 
+
+chroot =
+
+#启动时的Chroot目录. 所定义的目录需要是绝对路径. 如果没有设置, 则chroot不被使用.
+
+ 
+
+chdir =
+
+#设置启动目录，启动时会自动Chdir到该目录. 所定义的目录需要是绝对路径. 默认值: 当前目录，或者/目录（chroot时）
+
+ 
+
+catch_workers_output = yes
+
+#重定向运行过程中的stdout和stderr到主要的错误日志文件中. 如果没有设置, stdout 和 stderr 将会根据FastCGI的规则被重定向到 /dev/null . 默认值: 空.
+
+
+1）php-fpm进程分配
+
+在之前的文章中就说过了。在fasgcgi模式下，php会启动多个php-fpm进程，来接收nginx发来的请求，那是不是进程越多，速度就越快呢？这可不一定！得根据我们的机器配置和业务量来决定。
+
+我们先来看下，设定进程的配置在哪里？
+
+pm = static | dynamic | ondemand
+
+pm可以设置成这样3种，我们用的最多的就上前面2种。
+
+pm = static模式
+
+pm = static 表示我们创建的php-fpm子进程数量是固定的，那么就只有pm.max_children = 50这个参数生效。你启动php-fpm的时候就会一起全部启动51(1个主＋50个子)个进程，颇为壮观。
+
+pm = dynamic模式
+
+pm = dynamic模式，表示启动进程是动态分配的，随着请求量动态变化的。他由pm.max_children，pm.start_servers，pm.min_spare_servers，pm.max_spare_servers 这几个参数共同决定。
+
+上面已经讲过，这里再重申一下吧：
+
+pm.max_children ＝ 50是最大可创建的子进程的数量。必须设置。这里表示最多只能50个子进程。
+
+pm.start_servers = 20随着php-fpm一起启动时创建的子进程数目。默认值：min_spare_servers + (max_spare_servers – min_spare_servers) / 2。这里表示，一起启动会有20个子进程。
+
+pm.min_spare_servers = 10
+
+设置服务器空闲时最小php-fpm进程数量。必须设置。如果空闲的时候，会检查如果少于10个，就会启动几个来补上。
+
+pm.max_spare_servers = 30
+
+设置服务器空闲时最大php-fpm进程数量。必须设置。如果空闲时，会检查进程数，多于30个了，就会关闭几个，达到30个的状态。
+到底选择static还数dynamic?
+
+很多人恐惧症来袭，不知道选什么好？
+
+一般原则是：动态适合小内存机器，灵活分配进程，省内存。静态适用于大内存机器，动态创建回收进程对服务器资源也是一种消耗。
+
+如果你的内存很大，有8-20G，按照一个php-fpm进程20M算，100个就2G内存了，那就可以开启static模式。如果你的内存很小，比如才256M，那就要小心设置了，因为你的机器里面的其他的进程也算需要占用内存的，所以设置成dynamic是最好的，比如：pm.max_chindren = 8, 占用内存160M左右，而且可以随时变化，对于一半访问量的网站足够了。
+
+2）慢日志查询
+
+我们有时候会经常饱受500,504问题困扰。当nginx收到如上错误码时，可以确定后端php-fpm解析php出了某种问题，比如，执行错误，执行超时。
+
+这个时候，我们是可以开启慢日志功能的。
+
+slowlog = /usr/local/var/log/php-fpm.log.slow
+
+request_slowlog_timeout = 15s
+
+当一个请求该设置的超时时间15秒后，就会将对应的PHP调用堆栈信息完整写入到慢日志中。
+
+php-fpm慢日志会记录下进程号，脚本名称，具体哪个文件哪行代码的哪个函数执行时间过长：
+
+[21-Nov-2013 14:30:38] [pool www] pid 11877
+script_filename = /usr/local/lnmp/nginx/html/www.quancha.cn/www/fyzb.php
+[0xb70fb88c] file_get_contents() /usr/local/lnmp/nginx/html/www.quancha.cn/www/fyzb.php:2
+
+通过日志，我们就可以知道第2行的file_get_contents 函数有点问题，这样我们就能追踪问题了。
+
+
+PHP-FPM 子进程数量，是不是越多越好？
+
+当然不是，pm.max_chindren，进程多了，增加进程管理的开销以及上下文切换的开销。
+
+更核心的是，能并发执行的 php-fpm 进程不会超过 cpu 个数。
+
+如何设置，取决于你的代码
+
+如果代码是 CPU 计算密集型的，pm.max_chindren 不能超过 CPU 的内核数。
+
+如果不是，那么将 pm.max_chindren 的值大于 CPU 的内核数，是非常明智的。
+
+pm.max_chindren该怎么设置?
+
+国外技术大拿给出这么个公式：
+
+在 N + 20% 和 M/m 之间。
+
+N 是 CPU 内核数量。
+M 是 PHP 能利用的内存数量。
+m 是每个 PHP 进程平均使用的内存数量。
+适用于 dynamic 方式。
+
+static方式：M/(m * 1.2)
+
+当然，还有一种保险的方式，来配置 max_children。适用于 static 方式。
+
+先把 max_childnren 设置成一个比较大的值。
+稳定运行一段时间后，观察 php-fpm 的 status 里的 max
+active processes 是多少
+然后把 max_children 配置比它大一些就可以了。
+pm.max_requests：指的是每个子进程在处理了多少个请求数量之后就重启。
+
+这个参数，理论上可以随便设置，但是为了预防内存泄漏的风险，还是设置一个合理的数比较好

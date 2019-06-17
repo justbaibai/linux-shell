@@ -1,0 +1,7 @@
+数据库在手天下我有
+use zabbix;
+select * from users;
+select name,passwd from users; 
+ echo -n  baibai  | openssl md5
+(stdin)= 56d662e6060d8b64929ba4859146f0be
+update users set  passwd='56d662e6060d8b64929ba4859146f0be' where userid = '1';

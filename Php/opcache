@@ -1,0 +1,179 @@
+推荐的php.ini设置
+
+使用下列推荐设置来获得较好的性能：
+
+
+[opcache]
+zend_extension=opcache.so
+opcache.enable=1
+opcache.memory_consumption=128
+opcache.interned_strings_buffer=8
+opcache.max_accelerated_files=4000
+opcache.revalidate_freq=60
+;opcache.save_comments=0
+opcache.fast_shutdown=1
+opcache.enable_cli=1
+;opcache.optimization_level=0
+
+cat > /usr/local/php/etc/php.d/02-opcache.ini 
+
+你也可以禁用 opcache.save_comments 并且启用 opcache.enable_file_override。 需要提醒的是，在生产环境中使用上述配置之前，必须经过严格测试。 因为上述配置存在一个已知问题，它会引发一些框架和应用的异常， 尤其是在存在文档使用了备注注解的时候。
+
+以下是opcache的配置说明，其中给有值得都是默认配置：
+
+
+; opcache的开关,关闭时代码不再优化.
+opcache.enable=1
+ 
+; Determines if Zend OPCache is enabled for the CLI version of PHP
+opcache.enable_cli=1
+ 
+; OPcache的共享内存大小，以兆字节为单位。总共能够存储多少预编译的PHP代码(单位:MB)
+; 推荐128
+opcache.memory_consumption=64
+ 
+; 用来存储临时字符串的内存大小，以兆字节为单位.
+; 推荐8
+opcache.interned_strings_buffer=4
+ 
+; 最大缓存的文件数目200到100000之间.
+; 推荐4000
+opcache.max_accelerated_files=2000
+ 
+; 内存"浪费"达到此值对应的百分比,就会发起一个重启调度.
+opcache.max_wasted_percentage=5
+ 
+; 开启这条指令, Zend Optimizer + 会自动将当前工作目录的名字追加到脚本键上,以此消除同名文件间的键值命名冲突.关闭这条指令会提升性能,但是会对已存在的应用造成破坏.
+opcache.use_cwd=0
+ 
+; 开启文件时间戳验证
+opcache.validate_timestamps=1
+ 
+; 检查脚本时间戳是否有更新的周期，以秒为单位。设置为<i>0</i>会导致针对每个请求，OPcache都会检查脚本更新.
+; 推荐60
+opcache.revalidate_freq=2
+ 
+; 允许或禁止在include_path中进行文件搜索的优化.
+opcache.revalidate_path=0
+ 
+; 如果禁用，脚本文件中的注释内容将不会被包含到操作码缓存文件，这样可以有效减小优化后的文件体积,禁用此配置指令可能会导致一些依赖注释或注解的应用或框架无法正常工作，比如:Doctrine,Zend Framework2等.
+; 推荐0
+opcache.save_comments=1
+ 
+; 如果禁用，则即使文件中包含注释，也不会加载这些注释内容。本选项可以和opcache.save_comments一起使用，以实现按需加载注释内容.
+opcache.load_comments=1
+
+; 打开快速关闭,打开这个在PHP Request Shutdown的时候会收内存的速度会提高.
+; 推荐1
+opcache.fast_shutdown=1
+ 
+; 允许覆盖文件存在（file_exists等）的优化特性.
+opcache.enable_file_override=0 
+ 
+; 定义启动多少个优化过程.
+opcache.optimization_level=0xffffffff
+ 
+; 启用此Hack可以暂时性的解决"can’t redeclare class"错误.
+opcache.inherited_hack=1
+ 
+; 启用此Hack可以暂时性的解决"can’t redeclare class"错误.
+;opcache.dups_fix=0
+ 
+; 通过文件大小屏除大文件的缓存，默认情况下所有的文件都会被缓存.
+;opcache.max_file_size=0
+ 
+; 每N次请求检查一次缓存校验.默认值0表示检查被禁用了,由于计算校验值有损性能,这个指令应当紧紧在开发调试的时候开启.
+;opcache.consistency_checks=0
+ 
+; 从缓存不被访问后,等待多久后(单位为秒)调度重启.
+;opcache.force_restart_timeout=180
+ 
+; 日志记录level，默认只有fatal error和error.
+;opcache.error_log=
+ 
+; 将错误信息写入到服务器(Apache等)日志
+;opcache.log_verbosity_level=1
+ 
+; 内存共享的首选后台.留空则是让系统选择.
+;opcache.preferred_memory_model=
+ 
+; 运行php脚本时保护共享内存防止意外的写入,只对debug时有用.
+;opcache.protect_memory=0
+
+; opcache的开关,关闭时代码不再优化.
+opcache.enable=1
+ 
+; Determines if Zend OPCache is enabled for the CLI version of PHP
+opcache.enable_cli=1
+ 
+; OPcache的共享内存大小，以兆字节为单位。总共能够存储多少预编译的PHP代码(单位:MB)
+; 推荐128
+opcache.memory_consumption=64
+ 
+; 用来存储临时字符串的内存大小，以兆字节为单位.
+; 推荐8
+opcache.interned_strings_buffer=4
+ 
+; 最大缓存的文件数目200到100000之间.
+; 推荐4000
+opcache.max_accelerated_files=2000
+ 
+; 内存"浪费"达到此值对应的百分比,就会发起一个重启调度.
+opcache.max_wasted_percentage=5
+ 
+; 开启这条指令, Zend Optimizer + 会自动将当前工作目录的名字追加到脚本键上,以此消除同名文件间的键值命名冲突.关闭这条指令会提升性能,但是会对已存在的应用造成破坏.
+opcache.use_cwd=0
+ 
+; 开启文件时间戳验证
+opcache.validate_timestamps=1
+ 
+; 检查脚本时间戳是否有更新的周期，以秒为单位。设置为<i>0</i>会导致针对每个请求，OPcache都会检查脚本更新.
+; 推荐60
+opcache.revalidate_freq=2
+ 
+; 允许或禁止在include_path中进行文件搜索的优化.
+opcache.revalidate_path=0
+ 
+; 如果禁用，脚本文件中的注释内容将不会被包含到操作码缓存文件，这样可以有效减小优化后的文件体积,禁用此配置指令可能会导致一些依赖注释或注解的应用或框架无法正常工作，比如:Doctrine,Zend Framework2等.
+; 推荐0
+opcache.save_comments=1
+ 
+; 如果禁用，则即使文件中包含注释，也不会加载这些注释内容。本选项可以和opcache.save_comments一起使用，以实现按需加载注释内容.
+opcache.load_comments=1
+ 
+; 打开快速关闭,打开这个在PHP Request Shutdown的时候会收内存的速度会提高.
+; 推荐1
+opcache.fast_shutdown=1
+ 
+; 允许覆盖文件存在（file_exists等）的优化特性.
+opcache.enable_file_override=0 
+ 
+; 定义启动多少个优化过程.
+opcache.optimization_level=0xffffffff
+ 
+; 启用此Hack可以暂时性的解决"can’t redeclare class"错误.
+opcache.inherited_hack=1
+ 
+; 启用此Hack可以暂时性的解决"can’t redeclare class"错误.
+;opcache.dups_fix=0
+ 
+; 通过文件大小屏除大文件的缓存，默认情况下所有的文件都会被缓存.
+;opcache.max_file_size=0
+ 
+; 每N次请求检查一次缓存校验.默认值0表示检查被禁用了,由于计算校验值有损性能,这个指令应当紧紧在开发调试的时候开启.
+;opcache.consistency_checks=0
+ 
+; 从缓存不被访问后,等待多久后(单位为秒)调度重启.
+;opcache.force_restart_timeout=180
+ 
+; 日志记录level，默认只有fatal error和error.
+;opcache.error_log=
+ 
+; 将错误信息写入到服务器(Apache等)日志
+;opcache.log_verbosity_level=1
+ 
+; 内存共享的首选后台.留空则是让系统选择.
+;opcache.preferred_memory_model=
+ 
+; 运行php脚本时保护共享内存防止意外的写入,只对debug时有用.
+;opcache.protect_memory=0

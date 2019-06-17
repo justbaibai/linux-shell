@@ -1,0 +1,31 @@
+[root@localhost log]# lsof |grep deleted
+rsyslogd    560         root    4w      REG                8,3    291881    8615196 /var/log/messages (deleted)
+rsyslogd    560         root    9w      REG                8,3       396    8615198 /var/log/maillog (deleted)
+in:imjour   560  575    root    4w      REG                8,3    291881    8615196 /var/log/messages (deleted)
+in:imjour   560  575    root    9w      REG                8,3       396    8615198 /var/log/maillog (deleted)
+rs:main     560  576    root    4w      REG                8,3    291881    8615196 /var/log/messages (deleted)
+rs:main     560  576    root    9w      REG                8,3       396    8615198 /var/log/maillog (deleted)
+tuned       831         root    7u      REG                8,3      4096    8395495 /tmp/ffii9KQbf (deleted)
+gmain       831 1013    root    7u      REG                8,3      4096    8395495 /tmp/ffii9KQbf (deleted)
+tuned       831 1014    root    7u      REG                8,3      4096    8395495 /tmp/ffii9KQbf (deleted)
+tuned       831 1015    root    7u      REG                8,3      4096    8395495 /tmp/ffii9KQbf (deleted)
+tuned       831 1016    root    7u      REG                8,3      4096    8395495 /tmp/ffii9KQbf (deleted)
+[root@localhost log]# lsof |grep /var/log/messages
+rsyslogd    560         root    4w      REG                8,3    291881    8615196 /var/log/messages (deleted)
+in:imjour   560  575    root    4w      REG                8,3    291881    8615196 /var/log/messages (deleted)
+rs:main     560  576    root    4w      REG                8,3    291881    8615196 /var/log/messages (deleted)
+[root@localhost log]# cat /proc/560/fd/4 >/var/log/messages
+[root@localhost log]# diff  一下  没问题
+cp -a  不行
+
+
+我见过最多的还是他两
+嘻嘻  还是看一下   
+-rw-------. 1 root root   4042 Dec 14 13:11 secure
+-rw-rw-r--. 1 root utmp   6144 Dec 14 13:11 wtmp
+文件在不在吧  
+应给给 > 清空了    嘻嘻
+这就是 大文件rm 还占空间  
+rm 一下删 不了那么多  就  for 一下   
+
+

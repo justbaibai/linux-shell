@@ -1,0 +1,20 @@
+（1）创建新会话：
+
+screen -S han
+vim test
+# 若要终止会话：退出vim->键入Ctrl-d
+
+screen vim test  # 直接指定在screen会话中运行的程序。这种情况下，退出vim即终止会话
+　　（2）在（1）中会话未终止时，键入Ctrl-a d，将detach该会话。
+
+　　（3）使用screen -ls查询所有会话：
+
+[root@localhost ~]# screen -ls
+There is a screen on:
+        3985.han        (Detached)
+1 Socket in /var/run/screen/S-root.
+　　可见会话当前状态是Detached的。
+
+　　（4）恢复会话：
+
+screen -r 3985  # 回到detach前的状态
