@@ -1,1 +1,5 @@
 
+wget -q  -S www.baidu.com 2>&1|grep 200|awk '{print $2}'
+ wget --spider -nv www.baidu.com  2>&1|awk '{print $5}'
+ curl -I -s www.baidu.com|grep 200|awk '{print $2}'
+  curl -I -o /dev/null -m 10 -s -w %{http_code} www.baidu.com
