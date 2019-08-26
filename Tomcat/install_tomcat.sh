@@ -8,5 +8,8 @@ echo "
 PATH=\$PATH:/usr/local/tomcat/bin
 ">>/etc/profile.d/tomcat.sh
 
+useradd tomcat
+passwd tomcat
+chown -R tomcat.tomcat /usr/local/apache-tomcat-8.5.45 
 source /etc/profile.d/tomcat.sh
 
