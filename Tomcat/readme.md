@@ -83,3 +83,8 @@ JAVA_OPTS="$JAVA_OPTS  -Xms10g -Xmx10g -XX:PermSize=1g -XX:MaxPermSize=2g -Xshar
 <Connector port="8080" protocol="HTTP/1.1"
                connectionTimeout="20000" maxThreads="1000" minSpareThreads="60" maxSpareThreads="600"  acceptCount="120"
                redirectPort="8443" URIEncoding="utf-8"/>
+               
+jmap -heap 20274
+ java.lang.RuntimeException: unknown CollectedHeap type : class sun.jvm.hotspot.gc_interface.CollectedHeap
+安装debuginfo，去网站http://debuginfo.centos.org/7/x86_64里面找匹配当前的openjdk的版本，小版本号也要匹配上。然后使用wget命令下载
+
