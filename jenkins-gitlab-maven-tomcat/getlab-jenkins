@@ -1,0 +1,44 @@
+Deploy Keys
+可以拉不可以推 enable
+两个项目以上
+settings - repository-deploy keys 在privately点enable
+
+如果是内网的话vim /etc/sysconfig/jenkins用root
+要不然就Jenkins-凭据-系统-全局凭据 (unrestricted) 选ssh私钥
+
+不改就用http的 在gitlab上的账号有权限就行
+
+做免密要  之后执行shell  就ok了
+
+备份jekins
+tar zcvf jenkins.tar.gz /var/lib/jenkins/
+
+插件：安版本发布  git parameter plugin
+一般上选着 git parameter
+Branches to build
+在源码管理上选${Tag}
+
+触发远程构建 (例如,使用脚本)  里的 在gitlab里的hook也填一样的
+插件：Build Authorization Token Root
+插件：gitlab
+Build when a change is pushed to GitLab. GitLab webhook URL: http://10.0.3.12:8080/project/baibai_frist
+webhook
+http：//ip/buildByToken/build?job=baibai_frist&token=XXXX
+GitLab： System Hooks
+jenkins：触发远程构建 (例如,使用脚本) Build when a change is pushed to GitLab. GitLab webhook URL: http://10.0.3.12:8080/project/baibai_frist
+选上面这两个
+
+
+java
+yum install -y maven
+mvn -version
+
+Maven Integration plugin
+SSH plugin
+Pulish Over SSH
+在configure里面配置
+hosname 写ip
+
+
+
+Jenkins使用Git SCM的时候有一项源码库浏览器的设置，起初不知道有何用，只是看了说明大概知道是会对每次build生成changes，然后并没有告诉怎么设置，选择一种浏览器后要填一个URL，然后就各种百度谷歌没找到答案
