@@ -7,7 +7,7 @@ useradd -s /sbin/nologin -M mysql
 chown -R mysql.mysql  /usr/local/mysql-5.7.25/*
 yum -y install autoconf libaio-devel
 #cp /usr/local/mysql-5.7.25/support-files/my-default.cnf /etc/my.cnf
-/usr/local/mysql-5.7.25/bin/mysqld  --initialize --basedir=/usr/local/mysql-5.7.25/ --datadir=/usr/local/mysql-5.7.25/data/ --user=mysql
+/usr/local/mysql-5.7.25/bin/mysqld  --initialize-insecure --basedir=/usr/local/mysql-5.7.25/ --datadir=/usr/local/mysql-5.7.25/data/ --user=mysql
 #/usr/local/mysql-5.6.43/bin/mysqld_safe&
 cp /usr/local/mysql-5.7.25/support-files/mysql.server /etc/init.d/mysqld
 chmod +x /etc/init.d/mysqld
