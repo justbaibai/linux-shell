@@ -37,5 +37,4 @@
 
 <a href="#"><img align="right" src="https://github.com/justbaibai/linux-shell/blob/master/img/返回顶部.png" title="回到顶部" border="0"></a>
 
-返回顶部.png
 关于运维的东西  
