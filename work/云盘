@@ -1,0 +1,48 @@
+系统设置
+css
+.copyright-content{display:none}
+
+<script>
+var html = document.getElementsByClassName("common-footer")[0].innerHTML;
+document.getElementsByClassName("common-footer")[0].innerHTML = html + "baibaikeji.com";
+</script>
+
+
+location ~ .*.(php|php5)$ {
+            root           /data;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_cache  one;
+#            proxy_cache cache_one;
+            include        fastcgi.conf;
+
+        }
+
+
+                location / {
+                    root   /data;
+                    index  index.html index.htm index.php;
+                }
+                location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
+                       {
+                        #proxy_cache cache_one;
+                        # proxy_cache_valid 200 302 24h;
+                        root /data;
+                        # proxy_cache_valid 301 30d;
+
+                         #proxy_cache_valid any 5m;
+                          expires 10d;
+                       }
+                       location ~ .*\.(js|css)?$
+                       {
+                          root /data;
+                          expires 1h;
+                       }
+                       location /NginxStatus {
+                           stub_status on;
+                           access_log on;
+                           auth_basic "NginxStatus";
+                           auth_basic_user_file confpasswd;
+                        }
+
+                        wget http://static.kodcloud.com/update/download/kodexplorer4.40.zip
