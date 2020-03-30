@@ -296,6 +296,11 @@ http
             #fastcgi_cache_valid 200 302 1h;  #不缓存这个可能没有设置；
             #fastcgi_cache_valid 301 1d;
             #fastcgi_cache_valid any 1m;
+            cdn 获得客户真实ip
+             set_real_ip_from  192.168.2.0/24;
+            set_real_ip_from  128.22.189.11; 上级代理
+            real_ip_header    X-Forwarded-For; 获取的头
+            real_ip_recursive on; 递归
         }
 
 
