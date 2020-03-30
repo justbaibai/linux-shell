@@ -116,6 +116,9 @@ http
              fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
     用的地方加
     fastcgi_cache one;
+     fastcgi_cache_valid 200 302 10m;
+     fastcgi_cache_valid 301      1h;
+     fastcgi_cache_valid any      1m;
     
 
 
