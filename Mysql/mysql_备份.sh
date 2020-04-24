@@ -22,3 +22,4 @@ delimiter;
 call rand_data(1000000);
 
 select count(*) from ht.t_100w;
+
