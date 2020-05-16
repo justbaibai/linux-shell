@@ -10,7 +10,7 @@
 
 ## :email:Contact | 联系我:
 
-[![facebook](https://github.com/justbaibai/linux-shell/blob/master/ico/facebook.svg)]()
+[![facebook](http://jaywcjlove.github.io/sb/p/facebook.svg)]()
 [![qq](https://github.com/justbaibai/linux-shell/blob/master/ico/qq.svg)]()
 [![qq-group](https://github.com/justbaibai/linux-shell/blob/master/ico/group.svg)]()
 [![blog](https://github.com/justbaibai/linux-shell/blob/master/ico/linux.svg)]() 
