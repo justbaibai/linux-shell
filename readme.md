@@ -10,7 +10,7 @@
 
 ## :email:Contact | 联系我:
 
-[![facebook](http://jaywcjlove.github.io/sb/p/facebook.svg)]()
+[![facebook](https://camo.githubusercontent.com/fa488d2b7f6862506b0b662e31742d5aaad5342c/687474703a2f2f6a617977636a6c6f76652e6769746875622e696f2f73622f69636f2f66616365626f6f6b2e737667)]()
 [![qq](https://github.com/justbaibai/linux-shell/blob/master/ico/qq.svg)]()
 [![qq-group](https://github.com/justbaibai/linux-shell/blob/master/ico/group.svg)]()
 [![blog](https://github.com/justbaibai/linux-shell/blob/master/ico/linux.svg)]() 
