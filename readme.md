@@ -35,6 +35,6 @@
  </p>
 
 
-<a href="#"><img align="right" src="https://s1.ax1x.com/2020/05/16/Y6mvqJ.jpg" border="0"></a>
+<a href="#"><img align="right" src="https://s1.ax1x.com/2020/05/16/Y6ntds.png" border="0"></a>
 
 关于运维的东西  
