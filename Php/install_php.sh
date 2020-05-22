@@ -8,3 +8,7 @@ make && make install
 ln -s /usr/local/php-5.6.38/  /usr/local/php
 cp /usr/local/php-5.6.38/etc/php-fpm.conf.default /usr/local/php-5.6.38/etc/php-fpm.conf
 cp /usr/local/src/php-5.6.38/php.ini-production  /usr/local/php/etc/php.ini
+#--enable-intl  --with-ldap 可选有的应用需要
+# yum install openldap-devel libicu-devel -y
+#cp -frp /usr/lib64/libldap* /usr/lib/
+ 
