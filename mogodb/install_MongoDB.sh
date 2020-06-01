@@ -57,8 +57,8 @@ vim  /etc/security/limits.d/90-nproc.conf
 use admin
 db.createUser(
 {
-    user: "baibai"
-    pwd: "baibai"
+    user: "baibai",
+    pwd: "baibai",
     roles: [{ role: "root", db: "admin"}]
 }
 )
@@ -79,7 +79,7 @@ storage:
    wiredTiger:
      engineConfig:
        cacheSizeGB: 1
-       directoryForIndenxs: true
+       directoryForIndexes: true
      collectionConfig:
        blockCompressor: zlib
      indexConfig:
